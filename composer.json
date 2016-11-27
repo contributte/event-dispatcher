@@ -1,0 +1,77 @@
+{
+  "name": "contributte/event-dispatcher",
+  "description": "Best event dispatcher to nette framework",
+  "keywords": ["nette", "symfony", "event", "dispatcher", "emitter"],
+  "type": "project",
+  "license": ["MIT"],
+  "homepage": "https://github.com/contributte/event-dispatcher",
+  "authors": [
+    {
+      "name": "Milan Felix Sulc",
+      "homepage": "https://jfx.cz"
+    }
+  ],
+  "require": {
+    "php": ">= 5.6",
+    "nette/di": "^2.4.4",
+    "symfony/event-dispatcher": "^3.1.7"
+  },
+  "require-dev": {
+    "ninjify/qa": "^0.3.1",
+    "nette/application": "^2.4.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Contributte\\EventDispatcher\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\Fixtures\\": "tests/fixtures"
+    }
+  },
+  "scripts": {
+    "qa": [
+      "@qa-linter",
+      "@qa-codesniffer"
+    ],
+    "ci": [
+      "@qa-linter",
+      "@qa-codesniffer",
+      "@qa-tester-info",
+      "@qa-tester"
+    ],
+    "qa-codesniffer": [
+      "Ninjify\\Composer\\Script\\CodeSniffer::execute"
+    ],
+    "qa-codefixer": [
+      "Ninjify\\Composer\\Script\\CodeFixer::execute"
+    ],
+    "qa-linter": [
+      "Ninjify\\Composer\\Script\\Linter::execute"
+    ],
+    "qa-tester": [
+      "tester tests/cases -s -p php -c tests/php-unix.ini"
+    ],
+    "qa-tester-info": [
+      "tester tests/cases -s -p php -c tests/php-unix.ini -i"
+    ]
+  },
+  "extra": {
+    "ninjify": {
+      "qa": {
+        "codesniffer": {
+          "ruleset": "nette",
+          "folders": ["src", "tests"]
+        },
+        "codefixer": {
+          "ruleset": "nette",
+          "folders": ["src", "tests"]
+        },
+        "linter": {
+          "folders": ["src", "tests"]
+        }
+      }
+    }
+  }
+}
