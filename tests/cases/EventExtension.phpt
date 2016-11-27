@@ -4,7 +4,7 @@
  * Test: DI\EventDispatcherExtensions
  */
 
-use Contributte\EventDispatcher\DI\EventDispatcherExtensions;
+use Contributte\EventDispatcher\DI\EventDispatcherExtension;
 use Nette\DI\Compiler;
 use Nette\DI\Container;
 use Nette\DI\ContainerLoader;
@@ -19,7 +19,7 @@ require_once __DIR__ . '/../bootstrap.php';
 test(function () {
     $loader = new ContainerLoader(TEMP_DIR, TRUE);
     $class = $loader->load(function (Compiler $compiler) {
-        $compiler->addExtension('events', new EventDispatcherExtensions());
+        $compiler->addExtension('events', new EventDispatcherExtension());
         $compiler->loadConfig(FileMock::create('
         services:
             foo: Tests\Fixtures\FooSubscriber
@@ -50,7 +50,7 @@ test(function () {
 test(function () {
     $loader = new ContainerLoader(TEMP_DIR, TRUE);
     $class = $loader->load(function (Compiler $compiler) {
-        $compiler->addExtension('events', new EventDispatcherExtensions());
+        $compiler->addExtension('events', new EventDispatcherExtension());
         $compiler->loadConfig(FileMock::create('
         services:
             foo: Tests\Fixtures\FooSubscriber

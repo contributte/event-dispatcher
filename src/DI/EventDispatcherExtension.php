@@ -19,7 +19,7 @@ use Nette\PhpGenerator\PhpLiteral;
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class EventDispatcherExtensions extends CompilerExtension
+final class EventDispatcherExtension extends CompilerExtension
 {
 
 	/** @var array */
