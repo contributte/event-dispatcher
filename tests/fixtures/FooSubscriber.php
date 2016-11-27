@@ -5,6 +5,9 @@ namespace Tests\Fixtures;
 use Contributte\EventDispatcher\EventSubscriber;
 use Symfony\Component\EventDispatcher\Event;
 
+/**
+ * @author Milan Felix Sulc <sulcmil@gmail.com>
+ */
 final class FooSubscriber implements EventSubscriber
 {
 
