@@ -25,8 +25,65 @@ composer require contributte/event-dispatcher
 
 ```yaml
 extensions:
-    console: Contributte\Events\DI\EventDispatcherExtensions
-    
+    events: Contributte\EventDispatcher\DI\EventDispatcherExtensions
+```
+
+Extension looks for all events implementing `Contributte\EventDispatcher\EventSubscriber`. And automatically adds them to the event dispatcher. 
+That's all. You don't have to be worried.
+
+## Configuration
+
+### Laziness
+
+Lazy options is enabled (`true`) as default. But you can override it.
+
+```yaml
+events:
+    lazy: true/false
+```
+
+### Nette.Application
+
+There are several nette events on which you can listen to.
+
+```php
+use Contributte\EventDispatcher\Events\Application\ApplicationEvents;
+```
+
+- `ApplicationEvents::ON_STARTUP`
+- `ApplicationEvents::ON_SHUTDOWN`
+- `ApplicationEvents::ON_REQUEST`
+- `ApplicationEvents::ON_PRESENTER`
+- `ApplicationEvents::ON_RESPONSE`
+- `ApplicationEvents::ON_ERROR`
+
+## Example
+
+```php
+use Contributte\EventDispatcher\Events\Application\ApplicationEvents;
+use Contributte\EventDispatcher\Events\Application\RequestEvent;
+use Contributte\EventDispatcher\EventSubscriber;
+
+final class LogRequestSubscriber implements EventSubscriber
+{
+
+	/**
+	 * @return array
+	 */
+	public static function getSubscribedEvents()
+	{
+		return [ApplicationEvents::ON_REQUEST => 'onLog'];
+	}
+
+	/**
+	 * @param RequestEvent $event
+	 * @return void
+	 */
+	public function onLog(RequestEvent $event)
+	{
+	}
+}
+
 ```
 
 -----
