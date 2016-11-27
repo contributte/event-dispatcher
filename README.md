@@ -1,6 +1,6 @@
 # Event Dispatcher
 
-Ultra easy-to-use `Symfony\EventDispatcher` to `Nette Framework`.
+Ultra easy-to-use [`Symfony\EventDispatcher`](https://github.com/symfony/event-dispatcher) to [`Nette Framework`](https://github.com/nette/).
 
 -----
 
