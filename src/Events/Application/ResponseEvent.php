@@ -12,36 +12,36 @@ use Nette\Application\IResponse;
 final class ResponseEvent extends BaseEvent
 {
 
-    /** @var Application */
-    private $application;
+	/** @var Application */
+	private $application;
 
-    /** @var IResponse */
-    private $response;
+	/** @var IResponse */
+	private $response;
 
-    /**
-     * @param Application $application
-     * @param IResponse $response
-     */
-    public function __construct(Application $application, IResponse $response)
-    {
-        $this->application = $application;
-        $this->response = $response;
-    }
+	/**
+	 * @param Application $application
+	 * @param IResponse $response
+	 */
+	public function __construct(Application $application, IResponse $response)
+	{
+		$this->application = $application;
+		$this->response = $response;
+	}
 
-    /**
-     * @return Application
-     */
-    public function getApplication()
-    {
-        return $this->application;
-    }
+	/**
+	 * @return Application
+	 */
+	public function getApplication()
+	{
+		return $this->application;
+	}
 
-    /**
-     * @return IResponse
-     */
-    public function getResponse()
-    {
-        return $this->response;
-    }
+	/**
+	 * @return IResponse
+	 */
+	public function getResponse()
+	{
+		return $this->response;
+	}
 
 }

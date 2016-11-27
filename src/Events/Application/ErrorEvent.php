@@ -15,40 +15,40 @@ use Throwable;
 final class ErrorEvent extends BaseEvent
 {
 
-    /** @var Application */
-    private $application;
+	/** @var Application */
+	private $application;
 
-    /** @var Exception|Error|Throwable */
-    private $throwable;
+	/** @var Exception|Error|Throwable */
+	private $throwable;
 
-    /**
-     * @param Application $application
-     * @param Exception|Error $throwable
-     */
-    public function __construct(Application $application, $throwable)
-    {
-        if (!($throwable instanceof Exception) && !($throwable instanceof Error)) {
-            throw new InvalidArgumentException(sprintf('Exception must be instance of Exception|Error'));
-        }
+	/**
+	 * @param Application $application
+	 * @param Exception|Error $throwable
+	 */
+	public function __construct(Application $application, $throwable)
+	{
+		if (!($throwable instanceof Exception) && !($throwable instanceof Error)) {
+			throw new InvalidArgumentException(sprintf('Exception must be instance of Exception|Error'));
+		}
 
-        $this->application = $application;
-        $this->throwable = $throwable;
-    }
+		$this->application = $application;
+		$this->throwable = $throwable;
+	}
 
-    /**
-     * @return Application
-     */
-    public function getApplication()
-    {
-        return $this->application;
-    }
+	/**
+	 * @return Application
+	 */
+	public function getApplication()
+	{
+		return $this->application;
+	}
 
-    /**
-     * @return Error|Exception
-     */
-    public function getThrowable()
-    {
-        return $this->throwable;
-    }
+	/**
+	 * @return Error|Exception
+	 */
+	public function getThrowable()
+	{
+		return $this->throwable;
+	}
 
 }

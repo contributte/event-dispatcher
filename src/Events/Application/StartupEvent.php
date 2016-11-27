@@ -11,23 +11,23 @@ use Nette\Application\Application;
 final class StartupEvent extends BaseEvent
 {
 
-    /** @var Application */
-    private $application;
+	/** @var Application */
+	private $application;
 
-    /**
-     * @param Application $application
-     */
-    public function __construct(Application $application)
-    {
-        $this->application = $application;
-    }
+	/**
+	 * @param Application $application
+	 */
+	public function __construct(Application $application)
+	{
+		$this->application = $application;
+	}
 
-    /**
-     * @return Application
-     */
-    public function getApplication()
-    {
-        return $this->application;
-    }
+	/**
+	 * @return Application
+	 */
+	public function getApplication()
+	{
+		return $this->application;
+	}
 
 }

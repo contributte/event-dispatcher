@@ -12,36 +12,36 @@ use Nette\Application\Request;
 final class RequestEvent extends BaseEvent
 {
 
-    /** @var Application */
-    private $application;
+	/** @var Application */
+	private $application;
 
-    /** @var Request */
-    private $request;
+	/** @var Request */
+	private $request;
 
-    /**
-     * @param Application $application
-     * @param Request $request
-     */
-    public function __construct(Application $application, Request $request)
-    {
-        $this->application = $application;
-        $this->request = $request;
-    }
+	/**
+	 * @param Application $application
+	 * @param Request $request
+	 */
+	public function __construct(Application $application, Request $request)
+	{
+		$this->application = $application;
+		$this->request = $request;
+	}
 
-    /**
-     * @return Application
-     */
-    public function getApplication()
-    {
-        return $this->application;
-    }
+	/**
+	 * @return Application
+	 */
+	public function getApplication()
+	{
+		return $this->application;
+	}
 
-    /**
-     * @return Request
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
+	/**
+	 * @return Request
+	 */
+	public function getRequest()
+	{
+		return $this->request;
+	}
 
 }

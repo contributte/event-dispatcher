@@ -12,36 +12,36 @@ use Nette\Application\IPresenter;
 final class PresenterEvent extends BaseEvent
 {
 
-    /** @var Application */
-    private $application;
+	/** @var Application */
+	private $application;
 
-    /** @var IPresenter */
-    private $presenter;
+	/** @var IPresenter */
+	private $presenter;
 
-    /**
-     * @param Application $application
-     * @param IPresenter $presenter
-     */
-    public function __construct(Application $application, IPresenter $presenter)
-    {
-        $this->application = $application;
-        $this->presenter = $presenter;
-    }
+	/**
+	 * @param Application $application
+	 * @param IPresenter $presenter
+	 */
+	public function __construct(Application $application, IPresenter $presenter)
+	{
+		$this->application = $application;
+		$this->presenter = $presenter;
+	}
 
-    /**
-     * @return Application
-     */
-    public function getApplication()
-    {
-        return $this->application;
-    }
+	/**
+	 * @return Application
+	 */
+	public function getApplication()
+	{
+		return $this->application;
+	}
 
-    /**
-     * @return IPresenter
-     */
-    public function getPresenter()
-    {
-        return $this->presenter;
-    }
+	/**
+	 * @return IPresenter
+	 */
+	public function getPresenter()
+	{
+		return $this->presenter;
+	}
 
 }
