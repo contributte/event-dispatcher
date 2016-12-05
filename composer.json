@@ -2,7 +2,7 @@
   "name": "contributte/event-dispatcher",
   "description": "Best event dispatcher to nette framework",
   "keywords": ["nette", "symfony", "event", "dispatcher", "emitter"],
-  "type": "project",
+  "type": "library",
   "license": ["MIT"],
   "homepage": "https://github.com/contributte/event-dispatcher",
   "authors": [
