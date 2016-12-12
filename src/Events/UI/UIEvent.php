@@ -2,12 +2,12 @@
 
 namespace Contributte\EventDispatcher\Events\UI;
 
-use Contributte\EventDispatcher\Events\BaseEvent;
+use Contributte\EventDispatcher\Events\AbstractEvent;
 
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-abstract class UIEvent extends BaseEvent
+abstract class UIEvent extends AbstractEvent
 {
 
 	/** @var UI */

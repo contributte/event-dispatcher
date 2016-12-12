@@ -2,14 +2,14 @@
 
 namespace Contributte\EventDispatcher\Events\Application;
 
-use Contributte\EventDispatcher\Events\BaseEvent;
+use Contributte\EventDispatcher\Events\AbstractEvent;
 use Nette\Application\Application;
 use Nette\Application\IResponse;
 
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class ResponseEvent extends BaseEvent
+final class ResponseEvent extends AbstractEvent
 {
 
 	/** @var Application */

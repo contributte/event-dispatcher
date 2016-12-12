@@ -2,14 +2,14 @@
 
 namespace Contributte\EventDispatcher\Events\Application;
 
-use Contributte\EventDispatcher\Events\BaseEvent;
+use Contributte\EventDispatcher\Events\AbstractEvent;
 use Nette\Application\Application;
 use Nette\Application\IPresenter;
 
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class PresenterEvent extends BaseEvent
+final class PresenterEvent extends AbstractEvent
 {
 
 	/** @var Application */

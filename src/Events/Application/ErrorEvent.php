@@ -2,7 +2,7 @@
 
 namespace Contributte\EventDispatcher\Events\Application;
 
-use Contributte\EventDispatcher\Events\BaseEvent;
+use Contributte\EventDispatcher\Events\AbstractEvent;
 use Contributte\EventDispatcher\Exceptions\Logical\InvalidArgumentException;
 use Error;
 use Exception;
@@ -12,7 +12,7 @@ use Throwable;
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class ErrorEvent extends BaseEvent
+final class ErrorEvent extends AbstractEvent
 {
 
 	/** @var Application */

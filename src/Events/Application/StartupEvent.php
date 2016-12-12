@@ -2,13 +2,13 @@
 
 namespace Contributte\EventDispatcher\Events\Application;
 
-use Contributte\EventDispatcher\Events\BaseEvent;
+use Contributte\EventDispatcher\Events\AbstractEvent;
 use Nette\Application\Application;
 
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class StartupEvent extends BaseEvent
+final class StartupEvent extends AbstractEvent
 {
 
 	/** @var Application */

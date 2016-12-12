@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-abstract class BaseEvent extends Event
+abstract class AbstractEvent extends Event
 {
 
 }
