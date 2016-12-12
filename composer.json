@@ -22,7 +22,7 @@
     "nette/application": "^2.4.2"
   },
   "suggest": {
-    "nette/di": "For CompilerExtension -> EventDispatcherExtension"
+    "nette/di": "to use EventDispatcherExtension[CompilerExtension]"
   },
   "autoload": {
     "psr-4": {
