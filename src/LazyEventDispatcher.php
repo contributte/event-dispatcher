@@ -8,7 +8,7 @@ use Nette\DI\Container;
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-class LazyEventManager extends EventManager
+class LazyEventDispatcher extends EventDispatcher
 {
 
 	/** @var Container */

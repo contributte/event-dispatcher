@@ -2,7 +2,7 @@
 
 namespace Contributte\EventDispatcher\DI;
 
-use Contributte\EventDispatcher\EventManager;
+use Contributte\EventDispatcher\EventDispatcher;
 use Contributte\EventDispatcher\Events\Application\ApplicationEvents;
 use Contributte\EventDispatcher\Events\Application\ErrorEvent;
 use Contributte\EventDispatcher\Events\Application\PresenterEvent;
@@ -11,7 +11,7 @@ use Contributte\EventDispatcher\Events\Application\ResponseEvent;
 use Contributte\EventDispatcher\Events\Application\ShutdownEvent;
 use Contributte\EventDispatcher\Events\Application\StartupEvent;
 use Contributte\EventDispatcher\EventSubscriber;
-use Contributte\EventDispatcher\LazyEventManager;
+use Contributte\EventDispatcher\LazyEventDispatcher;
 use Nette\DI\CompilerExtension;
 use Nette\DI\ServiceCreationException;
 use Nette\PhpGenerator\PhpLiteral;
@@ -38,11 +38,11 @@ final class EventDispatcherExtension extends CompilerExtension
 		$config = $this->validateConfig($this->defaults);
 
 		if ($config['lazy'] === TRUE) {
-			$builder->addDefinition($this->prefix('manager'))
-				->setClass(LazyEventManager::class);
+			$builder->addDefinition($this->prefix('dispatcher'))
+				->setClass(LazyEventDispatcher::class);
 		} else {
-			$builder->addDefinition($this->prefix('manager'))
-				->setClass(EventManager::class);
+			$builder->addDefinition($this->prefix('dispatcher'))
+				->setClass(EventDispatcher::class);
 		}
 	}
 
@@ -72,11 +72,11 @@ final class EventDispatcherExtension extends CompilerExtension
 	private function doBeforeCompile()
 	{
 		$builder = $this->getContainerBuilder();
-		$manager = $builder->getDefinition($this->prefix('manager'));
+		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
 
 		$subscribers = $builder->findByType(EventSubscriber::class);
 		foreach ($subscribers as $name => $subscriber) {
-			$manager->addSetup('addSubscriber', [$subscriber]);
+			$dispatcher->addSetup('addSubscriber', [$subscriber]);
 		}
 	}
 
@@ -88,7 +88,7 @@ final class EventDispatcherExtension extends CompilerExtension
 	private function doBeforeCompileLaziness()
 	{
 		$builder = $this->getContainerBuilder();
-		$manager = $builder->getDefinition($this->prefix('manager'));
+		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
 
 		$subscribers = $builder->findByType(EventSubscriber::class);
 		foreach ($subscribers as $name => $subscriber) {
@@ -101,20 +101,20 @@ final class EventDispatcherExtension extends CompilerExtension
 			 */
 			foreach ($events as $event => $args) {
 				if (is_string($args)) {
-					$manager->addSetup('addSubscriberLazy', [$event, $name]);
+					$dispatcher->addSetup('addSubscriberLazy', [$event, $name]);
 				} else if (is_string($args[0])) {
 					if (!method_exists($subscriber, $args[0])) {
 						throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', get_class($subscriber), $args[0]));
 					}
 
-					$manager->addSetup('addSubscriberLazy', [$event, $args[0]]);
+					$dispatcher->addSetup('addSubscriberLazy', [$event, $args[0]]);
 				} else {
 					foreach ($args as $arg) {
 						if (!method_exists($subscriber, $arg[0])) {
 							throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', get_class($subscriber), $arg[0]));
 						}
 
-						$manager->addSetup('addSubscriberLazy', [$event, $arg[0]]);
+						$dispatcher->addSetup('addSubscriberLazy', [$event, $arg[0]]);
 					}
 				}
 			}
@@ -134,41 +134,41 @@ final class EventDispatcherExtension extends CompilerExtension
 		if (!$builder->hasDefinition('application.application')) return;
 
 		$application = $builder->getDefinition('application.application');
-		$manager = $builder->getDefinition($this->prefix('manager'));
+		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
 
 		$application->addSetup('?->onStartup[] = function() {?->dispatch(?, new ?(...func_get_args()));}', [
 			'@self',
-			$manager,
+			$dispatcher,
 			ApplicationEvents::ON_STARTUP,
 			new PhpLiteral(StartupEvent::class),
 		]);
 		$application->addSetup('?->onError[] = function() {?->dispatch(?, new ?(...func_get_args()));}', [
 			'@self',
-			$manager,
+			$dispatcher,
 			ApplicationEvents::ON_ERROR,
 			new PhpLiteral(ErrorEvent::class),
 		]);
 		$application->addSetup('?->onPresenter[] = function() {?->dispatch(?, new ?(...func_get_args()));}', [
 			'@self',
-			$manager,
+			$dispatcher,
 			ApplicationEvents::ON_PRESENTER,
 			new PhpLiteral(PresenterEvent::class),
 		]);
 		$application->addSetup('?->onRequest[] = function() {?->dispatch(?, new ?(...func_get_args()));}', [
 			'@self',
-			$manager,
+			$dispatcher,
 			ApplicationEvents::ON_REQUEST,
 			new PhpLiteral(RequestEvent::class),
 		]);
 		$application->addSetup('?->onResponse[] = function() {?->dispatch(?, new ?(...func_get_args()));}', [
 			'@self',
-			$manager,
+			$dispatcher,
 			ApplicationEvents::ON_RESPONSE,
 			new PhpLiteral(ResponseEvent::class),
 		]);
 		$application->addSetup('?->onShutdown[] = function() {?->dispatch(?, new ?(...func_get_args()));}', [
 			'@self',
-			$manager,
+			$dispatcher,
 			ApplicationEvents::ON_SHUTDOWN,
 			new PhpLiteral(ShutdownEvent::class),
 		]);
