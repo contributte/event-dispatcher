@@ -17,7 +17,7 @@
   },
   "require-dev": {
     "ninjify/qa": "^0.3.2",
-    "ninjify/nunjuck": "^0.1",
+    "ninjify/nunjuck": "^0.1.1",
     "nette/di": "^2.4.4",
     "nette/application": "^2.4.2"
   },
