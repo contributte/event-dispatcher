@@ -17,63 +17,63 @@ use Tests\Fixtures\FooSubscriber;
 require_once __DIR__ . '/../bootstrap.php';
 
 test(function () {
-    $loader = new ContainerLoader(TEMP_DIR, TRUE);
-    $class = $loader->load(function (Compiler $compiler) {
-        $compiler->addExtension('events', new EventDispatcherExtension());
-        $compiler->loadConfig(FileMock::create('
+	$loader = new ContainerLoader(TEMP_DIR, TRUE);
+	$class = $loader->load(function (Compiler $compiler) {
+		$compiler->addExtension('events', new EventDispatcherExtension());
+		$compiler->loadConfig(FileMock::create('
         services:
             foo: Tests\Fixtures\FooSubscriber
 ', 'neon'));
-    }, 1);
+	}, 1);
 
-    /** @var Container $container */
-    $container = new $class;
+	/** @var Container $container */
+	$container = new $class;
 
-    /** @var EventDispatcherInterface $em */
-    $em = $container->getByType(EventDispatcherInterface::class);
+	/** @var EventDispatcherInterface $em */
+	$em = $container->getByType(EventDispatcherInterface::class);
 
-    // Subscriber is not created
-    Assert::false($container->isCreated('foo'));
+	// Subscriber is not created
+	Assert::false($container->isCreated('foo'));
 
-    // Dispatch event
-    $em->dispatch('baz.baz', new Event());
+	// Dispatch event
+	$em->dispatch('baz.baz', new Event());
 
-    // Subscriber is still not created
-    Assert::false($container->isCreated('foo'));
+	// Subscriber is still not created
+	Assert::false($container->isCreated('foo'));
 
-    /** @var FooSubscriber $subscriber */
-    $subscriber = $container->getByType(FooSubscriber::class);
-    Assert::equal([], $subscriber->onCall);
+	/** @var FooSubscriber $subscriber */
+	$subscriber = $container->getByType(FooSubscriber::class);
+	Assert::equal([], $subscriber->onCall);
 });
 
 
 test(function () {
-    $loader = new ContainerLoader(TEMP_DIR, TRUE);
-    $class = $loader->load(function (Compiler $compiler) {
-        $compiler->addExtension('events', new EventDispatcherExtension());
-        $compiler->loadConfig(FileMock::create('
+	$loader = new ContainerLoader(TEMP_DIR, TRUE);
+	$class = $loader->load(function (Compiler $compiler) {
+		$compiler->addExtension('events', new EventDispatcherExtension());
+		$compiler->loadConfig(FileMock::create('
         services:
             foo: Tests\Fixtures\FooSubscriber
 ', 'neon'));
-    }, 2);
+	}, 2);
 
-    /** @var Container $container */
-    $container = new $class;
+	/** @var Container $container */
+	$container = new $class;
 
-    /** @var EventDispatcherInterface $em */
-    $em = $container->getByType(EventDispatcherInterface::class);
+	/** @var EventDispatcherInterface $em */
+	$em = $container->getByType(EventDispatcherInterface::class);
 
-    // Subscriber is not created
-    Assert::false($container->isCreated('foo'));
+	// Subscriber is not created
+	Assert::false($container->isCreated('foo'));
 
-    // Dispatch event
-    $event = new Event();
-    $em->dispatch('foobar', $event);
+	// Dispatch event
+	$event = new Event();
+	$em->dispatch('foobar', $event);
 
-    // Subscriber is already created
-    Assert::true($container->isCreated('foo'));
+	// Subscriber is already created
+	Assert::true($container->isCreated('foo'));
 
-    /** @var FooSubscriber $subscriber */
-    $subscriber = $container->getByType(FooSubscriber::class);
-    Assert::equal([$event], $subscriber->onCall);
+	/** @var FooSubscriber $subscriber */
+	$subscriber = $container->getByType(FooSubscriber::class);
+	Assert::equal([$event], $subscriber->onCall);
 });
