@@ -7,7 +7,7 @@ use Contributte\EventDispatcher\Exceptions\LogicalException;
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class InvalidArgumentException extends LogicalException
+class InvalidArgumentException extends LogicalException
 {
 
 }

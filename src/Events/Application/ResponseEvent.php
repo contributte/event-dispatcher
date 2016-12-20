@@ -9,7 +9,7 @@ use Nette\Application\IResponse;
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class ResponseEvent extends AbstractEvent
+class ResponseEvent extends AbstractEvent
 {
 
 	/** @var Application */

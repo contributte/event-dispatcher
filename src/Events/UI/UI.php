@@ -7,7 +7,7 @@ use Nette\Application\UI\Control;
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class UI
+class UI
 {
 
 	/** @var array */

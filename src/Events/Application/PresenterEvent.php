@@ -9,7 +9,7 @@ use Nette\Application\IPresenter;
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class PresenterEvent extends AbstractEvent
+class PresenterEvent extends AbstractEvent
 {
 
 	/** @var Application */

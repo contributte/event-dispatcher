@@ -12,7 +12,7 @@ use Throwable;
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class ErrorEvent extends AbstractEvent
+class ErrorEvent extends AbstractEvent
 {
 
 	/** @var Application */

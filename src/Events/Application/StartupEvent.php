@@ -8,7 +8,7 @@ use Nette\Application\Application;
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class StartupEvent extends AbstractEvent
+class StartupEvent extends AbstractEvent
 {
 
 	/** @var Application */

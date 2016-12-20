@@ -9,7 +9,7 @@ use IteratorAggregate;
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class Changeset implements IteratorAggregate
+class Changeset implements IteratorAggregate
 {
 
 	/** @var array */

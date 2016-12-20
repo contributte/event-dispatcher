@@ -7,7 +7,7 @@ use Contributte\EventDispatcher\Exceptions\LogicalException;
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class InvalidStateException extends LogicalException
+class InvalidStateException extends LogicalException
 {
 
 }

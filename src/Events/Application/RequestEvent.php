@@ -9,7 +9,7 @@ use Nette\Application\Request;
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class RequestEvent extends AbstractEvent
+class RequestEvent extends AbstractEvent
 {
 
 	/** @var Application */

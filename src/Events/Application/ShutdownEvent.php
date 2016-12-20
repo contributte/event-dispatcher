@@ -12,7 +12,7 @@ use Throwable;
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
  */
-final class ShutdownEvent extends AbstractEvent
+class ShutdownEvent extends AbstractEvent
 {
 
 	/** @var Application */
