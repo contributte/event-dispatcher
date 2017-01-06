@@ -1,6 +1,6 @@
 {
   "name": "contributte/event-dispatcher",
-  "description": "Best event dispatcher to nette framework",
+  "description": "Best event dispatcher / event manager / event emitter for Nette Framework",
   "keywords": ["nette", "symfony", "event", "dispatcher", "emitter"],
   "type": "library",
   "license": ["MIT"],
