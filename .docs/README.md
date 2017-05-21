@@ -5,6 +5,7 @@
 - [Usage - how to register](#usage)
 - [Configuration - how to configure](#configuration)
 - [Subscriber - example subscriber](#subscriber)
+- [Bridges - nette bridges](#bridges)
 
 ## Usage
 
@@ -16,14 +17,16 @@ extensions:
 Extension looks for all subscribers in DIC implementing `Symfony\Component\EventDispatcher\EventSubscriberInterface`. And automatically adds them to the event dispatcher. 
 That's all. You don't have to be worried.
 
+## Configuration
+
+### Autoload
+
 If you would like to add all subscribers by yourself, you have to disable `autoload`.
 
 ```yaml
 events:
     autoload: true/false
 ```
-
-## Configuration
 
 ### Laziness
 
@@ -33,21 +36,6 @@ Lazy options is enabled (`true`) as default. But you can override it.
 events:
     lazy: true/false
 ```
-
-### Nette.Application
-
-There are several nette events on which you can listen to.
-
-```php
-use Contributte\EventDispatcher\Events\Application\ApplicationEvents;
-```
-
-- `ApplicationEvents::ON_STARTUP`
-- `ApplicationEvents::ON_SHUTDOWN`
-- `ApplicationEvents::ON_REQUEST`
-- `ApplicationEvents::ON_PRESENTER`
-- `ApplicationEvents::ON_RESPONSE`
-- `ApplicationEvents::ON_ERROR`
 
 ## Subscriber
 
@@ -75,4 +63,24 @@ final class OrderPaidLoggerSubscriber implements EventSubscriber
 	    // Do some magic here...
 	}
 }
+```
+
+## Bridges
+
+The goal of this library is to be the most tiniest and purest adaptation of [Symfony Event-Dispatcher](https://github.com/symfony/event-dispatcher) to [Nette Framework](https://github.com/nette/).
+
+As you can see only one `Extension` class is provided. Nette has many single packages and here comes the bridges.
+
+There are many bridges:
+
+| Nette       | Composer                   | Description                                                   |
+|-------------|----------------------------|---------------------------------------------------------------|
+| Application | `event-application-bridge` | To track onRequest, onStartup and other application's events. |
+| Security    | `event-security-bridge`    | To track onLogin and onLogout events.                         |
+
+Include all these bridges might be little bit awkward and for that I have made an aggregation package. The `event-bridges`
+aggregate all of these nette bridges to one big bridge.
+
+```
+composer require event-bridges
 ```
