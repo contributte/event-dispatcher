@@ -3,18 +3,9 @@
 namespace Contributte\EventDispatcher\DI;
 
 use Contributte\EventDispatcher\EventDispatcher;
-use Contributte\EventDispatcher\Events\Application\ApplicationEvents;
-use Contributte\EventDispatcher\Events\Application\ErrorEvent;
-use Contributte\EventDispatcher\Events\Application\PresenterEvent;
-use Contributte\EventDispatcher\Events\Application\RequestEvent;
-use Contributte\EventDispatcher\Events\Application\ResponseEvent;
-use Contributte\EventDispatcher\Events\Application\ShutdownEvent;
-use Contributte\EventDispatcher\Events\Application\StartupEvent;
-use Contributte\EventDispatcher\EventSubscriber;
 use Contributte\EventDispatcher\LazyEventDispatcher;
 use Nette\DI\CompilerExtension;
 use Nette\DI\ServiceCreationException;
-use Nette\PhpGenerator\PhpLiteral;
 
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
@@ -60,8 +51,6 @@ class EventDispatcherExtension extends CompilerExtension
 		} else {
 			$this->doBeforeCompile();
 		}
-
-		$this->doBeforeCompileBridge();
 	}
 
 	/**
@@ -119,59 +108,6 @@ class EventDispatcherExtension extends CompilerExtension
 				}
 			}
 		}
-	}
-
-	/**
-	 * Build bridge into nette application events
-	 *
-	 * @return void
-	 */
-	private function doBeforeCompileBridge()
-	{
-		$builder = $this->getContainerBuilder();
-
-		// Skip if nette application is not provided
-		if (!$builder->hasDefinition('application.application')) return;
-
-		$application = $builder->getDefinition('application.application');
-		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
-
-		$application->addSetup('?->onStartup[] = function() {?->dispatch(?, new ?(...func_get_args()));}', [
-			'@self',
-			$dispatcher,
-			ApplicationEvents::ON_STARTUP,
-			new PhpLiteral(StartupEvent::class),
-		]);
-		$application->addSetup('?->onError[] = function() {?->dispatch(?, new ?(...func_get_args()));}', [
-			'@self',
-			$dispatcher,
-			ApplicationEvents::ON_ERROR,
-			new PhpLiteral(ErrorEvent::class),
-		]);
-		$application->addSetup('?->onPresenter[] = function() {?->dispatch(?, new ?(...func_get_args()));}', [
-			'@self',
-			$dispatcher,
-			ApplicationEvents::ON_PRESENTER,
-			new PhpLiteral(PresenterEvent::class),
-		]);
-		$application->addSetup('?->onRequest[] = function() {?->dispatch(?, new ?(...func_get_args()));}', [
-			'@self',
-			$dispatcher,
-			ApplicationEvents::ON_REQUEST,
-			new PhpLiteral(RequestEvent::class),
-		]);
-		$application->addSetup('?->onResponse[] = function() {?->dispatch(?, new ?(...func_get_args()));}', [
-			'@self',
-			$dispatcher,
-			ApplicationEvents::ON_RESPONSE,
-			new PhpLiteral(ResponseEvent::class),
-		]);
-		$application->addSetup('?->onShutdown[] = function() {?->dispatch(?, new ?(...func_get_args()));}', [
-			'@self',
-			$dispatcher,
-			ApplicationEvents::ON_SHUTDOWN,
-			new PhpLiteral(ShutdownEvent::class),
-		]);
 	}
 
 }
