@@ -1,6 +1,6 @@
 # Event Dispatcher
 
-## Content
+## Content (:gift:)
 
 - [Usage - how to register](#usage)
 - [Configuration - how to configure](#configuration)
@@ -17,7 +17,7 @@ extensions:
 Extension looks for all subscribers in DIC implementing `Symfony\Component\EventDispatcher\EventSubscriberInterface`. And automatically adds them to the event dispatcher. 
 That's all. You don't have to be worried.
 
-## Configuration
+## Configuration (:wrench:)
 
 ### Autoload
 
@@ -73,13 +73,13 @@ As you can see only one `Extension` class is provided. Nette has many single pac
 
 There are many bridges:
 
-| Nette       | Composer                   | Description                                                   |
-|-------------|----------------------------|---------------------------------------------------------------|
-| Application | `event-application-bridge` | To track onRequest, onStartup and other application's events. |
-| Security    | `event-security-bridge`    | To track onLogin and onLogout events.                         |
+| Nette                                               | Composer                                                                              | Description                                                   |
+|-----------------------------------------------------|---------------------------------------------------------------------------------------|---------------------------------------------------------------|
+| [Application](https://github.com/nette/application) | [`event-application-bridge`](https://github.com/contributte/event-application-bridge) | To track onRequest, onStartup and other application's events. |
+| [Security](https://github.com/nette/security)       | [`event-security-bridge`](https://github.com/contributte/event-security-bridge)       | To track onLogin and onLogout events.                         |
 
-Include all these bridges might be little bit awkward and for that I have made an aggregation package. The `event-bridges`
-aggregate all of these nette bridges to one big bridge.
+Include all these bridges might be little bit boring (:cry:) and for that I have made an aggregation package. The `event-bridges`
+aggregate all of these nette bridges to one big bridge (:recycle:).
 
 ```
 composer require event-bridges
