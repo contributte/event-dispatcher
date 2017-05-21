@@ -32,10 +32,10 @@ composer require contributte/event-dispatcher
 
 ## Overview
 
-- [Usage - how to register](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#usage)
-- [Configuration - how to configure](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#configuration)
-- [Subscriber - example subscriber](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#subscriber)
-- [Bridges - nette bridges](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#bridges)
+- [Usage - how to register](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#usage-tada)
+- [Configuration - how to configure](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#configuration-wrench)
+- [Subscriber - example subscriber](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#subscriber-bulb)
+- [Bridges - nette bridges](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#bridges-recycle)
 
 ---
 

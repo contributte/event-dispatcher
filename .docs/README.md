@@ -2,10 +2,10 @@
 
 ## Content :gift:
 
-- [Usage - how to register](#usage)
-- [Configuration - how to configure](#configuration)
-- [Subscriber - example subscriber](#subscriber)
-- [Bridges - nette bridges](#bridges)
+- [Usage - how to register](#usage-tada)
+- [Configuration - how to configure](#configuration-wrench)
+- [Subscriber - example subscriber](#subscriber-bulb)
+- [Bridges - nette bridges](#bridges-recycle)
 
 ## Usage :tada:
 
@@ -65,7 +65,7 @@ final class OrderPaidLoggerSubscriber implements EventSubscriber
 }
 ```
 
-## Bridges
+## Bridges :recycle:
 
 The goal of this library is to be the most tiniest and purest adaptation of [Symfony Event-Dispatcher](https://github.com/symfony/event-dispatcher) to [Nette Framework](https://github.com/nette/).
 
