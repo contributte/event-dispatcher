@@ -17,6 +17,7 @@ class EventDispatcherExtension extends CompilerExtension
 	/** @var array */
 	private $defaults = [
 		'lazy' => TRUE,
+		'autoload' => TRUE,
 	];
 
 	/**
@@ -47,10 +48,12 @@ class EventDispatcherExtension extends CompilerExtension
 	{
 		$config = $this->validateConfig($this->defaults);
 
-		if ($config['lazy'] === TRUE) {
-			$this->doBeforeCompileLaziness();
-		} else {
-			$this->doBeforeCompile();
+		if ($config['autoload'] === TRUE) {
+			if ($config['lazy'] === TRUE) {
+				$this->doBeforeCompileLaziness();
+			} else {
+				$this->doBeforeCompile();
+			}
 		}
 	}
 
