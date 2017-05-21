@@ -24,71 +24,16 @@ Ultra easy-to-use [`Symfony\EventDispatcher`](https://github.com/symfony/event-d
 composer require contributte/event-dispatcher
 ```
 
-## Usage
+## Versions
 
-```yaml
-extensions:
-    events: Contributte\EventDispatcher\DI\EventDispatcherExtensions
-```
+| State       | Version | Branch   | PHP      |
+|-------------|---------|----------|----------|
+| development | `^0.2`  | `master` | `>= 5.6` |
 
-Extension looks for all events implementing `Contributte\EventDispatcher\EventSubscriber`. And automatically adds them to the event dispatcher. 
-That's all. You don't have to be worried.
+## Overview
 
-## Configuration
+- [FormFactory (FormFactoryExtension)](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#form-factory)
 
-### Laziness
-
-Lazy options is enabled (`true`) as default. But you can override it.
-
-```yaml
-events:
-    lazy: true/false
-```
-
-### Nette.Application
-
-There are several nette events on which you can listen to.
-
-```php
-use Contributte\EventDispatcher\Events\Application\ApplicationEvents;
-```
-
-- `ApplicationEvents::ON_STARTUP`
-- `ApplicationEvents::ON_SHUTDOWN`
-- `ApplicationEvents::ON_REQUEST`
-- `ApplicationEvents::ON_PRESENTER`
-- `ApplicationEvents::ON_RESPONSE`
-- `ApplicationEvents::ON_ERROR`
-
-## Example
-
-```php
-use Contributte\EventDispatcher\Events\Application\ApplicationEvents;
-use Contributte\EventDispatcher\Events\Application\RequestEvent;
-use Contributte\EventDispatcher\EventSubscriber;
-
-final class LogRequestSubscriber implements EventSubscriber
-{
-
-	/**
-	 * @return array
-	 */
-	public static function getSubscribedEvents()
-	{
-		return [ApplicationEvents::ON_REQUEST => 'onLog'];
-	}
-
-	/**
-	 * @param RequestEvent $event
-	 * @return void
-	 */
-	public function onLog(RequestEvent $event)
-	{
-	}
-}
-
-```
-
------
+---
 
 Thank you for testing, reporting and contributing.
