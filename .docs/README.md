@@ -1,13 +1,13 @@
 # Event Dispatcher
 
-## Content (:gift:)
+## Content :gift:
 
 - [Usage - how to register](#usage)
 - [Configuration - how to configure](#configuration)
 - [Subscriber - example subscriber](#subscriber)
 - [Bridges - nette bridges](#bridges)
 
-## Usage
+## Usage :tada:
 
 ```yaml
 extensions:
@@ -17,7 +17,7 @@ extensions:
 Extension looks for all subscribers in DIC implementing `Symfony\Component\EventDispatcher\EventSubscriberInterface`. And automatically adds them to the event dispatcher. 
 That's all. You don't have to be worried.
 
-## Configuration (:wrench:)
+## Configuration :wrench:
 
 ### Autoload
 
@@ -37,7 +37,7 @@ events:
     lazy: true/false
 ```
 
-## Subscriber
+## Subscriber :bulb:
 
 ```php
 use Contributte\EventDispatcher\EventSubscriber;
