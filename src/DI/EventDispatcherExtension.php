@@ -6,6 +6,7 @@ use Contributte\EventDispatcher\EventDispatcher;
 use Contributte\EventDispatcher\LazyEventDispatcher;
 use Nette\DI\CompilerExtension;
 use Nette\DI\ServiceCreationException;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
@@ -63,7 +64,7 @@ class EventDispatcherExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
 
-		$subscribers = $builder->findByType(EventSubscriber::class);
+		$subscribers = $builder->findByType(EventSubscriberInterface::class);
 		foreach ($subscribers as $name => $subscriber) {
 			$dispatcher->addSetup('addSubscriber', [$subscriber]);
 		}
@@ -79,7 +80,7 @@ class EventDispatcherExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
 
-		$subscribers = $builder->findByType(EventSubscriber::class);
+		$subscribers = $builder->findByType(EventSubscriberInterface::class);
 		foreach ($subscribers as $name => $subscriber) {
 			$events = call_user_func([$subscriber->getEntity(), 'getSubscribedEvents']);
 

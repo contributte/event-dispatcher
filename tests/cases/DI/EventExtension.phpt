@@ -10,19 +10,20 @@ use Nette\DI\Container;
 use Nette\DI\ContainerLoader;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Tester\Assert;
 use Tester\FileMock;
 use Tests\Fixtures\FooSubscriber;
 
-require_once __DIR__ . '/../bootstrap.php';
+require_once __DIR__ . '/../../bootstrap.php';
 
 test(function () {
 	$loader = new ContainerLoader(TEMP_DIR, TRUE);
 	$class = $loader->load(function (Compiler $compiler) {
 		$compiler->addExtension('events', new EventDispatcherExtension());
 		$compiler->loadConfig(FileMock::create('
-        services:
-            foo: Tests\Fixtures\FooSubscriber
+		services:
+			foo: Tests\Fixtures\FooSubscriber
 ', 'neon'));
 	}, 1);
 
@@ -46,14 +47,13 @@ test(function () {
 	Assert::equal([], $subscriber->onCall);
 });
 
-
 test(function () {
 	$loader = new ContainerLoader(TEMP_DIR, TRUE);
 	$class = $loader->load(function (Compiler $compiler) {
 		$compiler->addExtension('events', new EventDispatcherExtension());
 		$compiler->loadConfig(FileMock::create('
-        services:
-            foo: Tests\Fixtures\FooSubscriber
+		services:
+			foo: Tests\Fixtures\FooSubscriber
 ', 'neon'));
 	}, 2);
 
@@ -76,4 +76,21 @@ test(function () {
 	/** @var FooSubscriber $subscriber */
 	$subscriber = $container->getByType(FooSubscriber::class);
 	Assert::equal([$event], $subscriber->onCall);
+});
+
+test(function () {
+	$loader = new ContainerLoader(TEMP_DIR, TRUE);
+	$class = $loader->load(function (Compiler $compiler) {
+		$compiler->addExtension('events', new EventDispatcherExtension());
+		$compiler->loadConfig(FileMock::create('
+		services:
+			foo: Tests\Fixtures\FooSubscriber
+			bar: Tests\Fixtures\BarSubscriber
+', 'neon'));
+	}, 3);
+
+	/** @var Container $container */
+	$container = new $class;
+
+	Assert::count(2, $container->findByType(EventSubscriberInterface::class));
 });

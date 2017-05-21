@@ -4,6 +4,7 @@ namespace Contributte\EventDispatcher;
 
 use Contributte\EventDispatcher\Exceptions\Logical\InvalidStateException;
 use Nette\DI\Container;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
@@ -37,7 +38,7 @@ class LazyEventDispatcher extends EventDispatcher
 				$listener = $this->container->getService($serviceName);
 
 				// Just for sure, validate type
-				if ($listener instanceof EventSubscriber) {
+				if ($listener instanceof EventSubscriberInterface) {
 					$this->addSubscriber($listener);
 				} else {
 					throw new InvalidStateException('Unsupported type of subscriber');
