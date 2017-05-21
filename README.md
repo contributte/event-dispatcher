@@ -32,7 +32,10 @@ composer require contributte/event-dispatcher
 
 ## Overview
 
-- [FormFactory (FormFactoryExtension)](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#form-factory)
+- [Usage - how to register](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#usage)
+- [Configuration - how to configure](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#configuration)
+- [Subscriber - example subscriber](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#subscriber)
+- [Bridges - nette bridges](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#bridges)
 
 ---
 
