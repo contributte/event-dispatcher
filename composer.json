@@ -16,9 +16,9 @@
     "symfony/event-dispatcher": "^3.2.0"
   },
   "require-dev": {
-    "ninjify/qa": "^0.3.3",
+    "ninjify/qa": "^0.4.0",
     "ninjify/nunjuck": "^0.1.4",
-    "nette/di": "^2.4.4"
+    "nette/di": "^2.4.9"
   },
   "suggest": {
     "nette/di": "to use EventDispatcherExtension[CompilerExtension]"
