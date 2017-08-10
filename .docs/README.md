@@ -11,7 +11,7 @@
 
 ```yaml
 extensions:
-    events: Contributte\EventDispatcher\DI\EventDispatcherExtensions
+    events: Contributte\EventDispatcher\DI\EventDispatcherExtension
 ```
 
 Extension looks for all subscribers in DIC implementing `Symfony\Component\EventDispatcher\EventSubscriberInterface`. And automatically adds them to the event dispatcher. 
