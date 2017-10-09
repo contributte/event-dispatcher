@@ -16,7 +16,10 @@ class LazyEventDispatcher extends EventDispatcher
 	private $container;
 
 	/** @var array */
-	private $services = [];
+	private $mapping = [];
+
+	/** @var array */
+	private $instanced = [];
 
 	/**
 	 * @param Container $container
@@ -32,8 +35,12 @@ class LazyEventDispatcher extends EventDispatcher
 	 */
 	public function getListeners($eventName = NULL)
 	{
-		if (isset($this->services[$eventName])) {
-			foreach ($this->services[$eventName] as $serviceName) {
+		if (isset($this->mapping[$eventName])) {
+			foreach ($this->mapping[$eventName] as $serviceName) {
+				// If service is already instanced, them skip it.
+				// It may producer multiple event registering.
+				if (isset($this->instanced[$serviceName])) continue;
+
 				// Obtain service from container
 				$listener = $this->container->getService($serviceName);
 
@@ -43,10 +50,13 @@ class LazyEventDispatcher extends EventDispatcher
 				} else {
 					throw new InvalidStateException('Unsupported type of subscriber');
 				}
+
+				// Mark services as instanced
+				$this->instanced[$serviceName] = TRUE;
 			}
 
 			// Unset already attached listeners
-			unset($this->services[$eventName]);
+			unset($this->mapping[$eventName]);
 		}
 
 		return parent::getListeners($eventName);
@@ -60,11 +70,11 @@ class LazyEventDispatcher extends EventDispatcher
 	 */
 	public function addSubscriberLazy($eventName, $serviceName)
 	{
-		if (empty($this->services[$eventName])) {
-			$this->services[$eventName] = [];
+		if (empty($this->mapping[$eventName])) {
+			$this->mapping[$eventName] = [];
 		}
 
-		$this->services[$eventName][] = $serviceName;
+		$this->mapping[$eventName][] = $serviceName;
 	}
 
 }
