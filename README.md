@@ -33,6 +33,7 @@ composer require contributte/event-dispatcher
 - [Usage - how to register](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#usage-tada)
 - [Configuration - how to configure](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#configuration-wrench)
 - [Subscriber - example subscriber](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#subscriber-bulb)
+- [Dispatcher - dispatching events](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#dispatcher-zap)
 - [Bridges - nette bridges](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#bridges-recycle)
 
 ## Maintainers
