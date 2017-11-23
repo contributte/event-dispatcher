@@ -18,7 +18,7 @@ Please take a look at official documentation: https://symfony.com/doc/current/co
 
 **Event** is a value object that has all data.
 
-**Dispatcher** is managing class that tracks all listeners and thru `dispatch` method emitting all events.
+**Dispatcher** is manager class that tracks all listeners and thru `dispatch` method emits all events.
 
 ## Usage :tada:
 
@@ -29,7 +29,7 @@ extensions:
     events: Contributte\EventDispatcher\DI\EventDispatcherExtension
 ```
 
-`EventDispatcherExtension` looks for all services implementing `Symfony\Component\EventDispatcher\EventSubscriberInterface`. 
+The extension looks for all services implementing `Symfony\Component\EventDispatcher\EventSubscriberInterface`. 
 And automatically adds them to the event dispatcher. That's all. You don't have to be worried.
 
 ## Configuration :wrench:
@@ -58,22 +58,18 @@ events:
 use Contributte\EventDispatcher\EventSubscriber;
 use Symfony\Component\EventDispatcher\Event;
 
-final class OrderPaidLoggerSubscriber implements EventSubscriber
+final class OrderLoggerSubscriber implements EventSubscriber
 {
-
-	/**
-	 * @return array
-	 */
 	public static function getSubscribedEvents()
 	{
-		return ['order.paid' => 'onLog'];
+		return [
+			'order.created' => 'log',
+			'order.updated' => 'log',
+			'order.paid' => 'log',
+		];
 	}
 
-	/**
-	 * @param Event $event
-	 * @return void
-	 */
-	public function onLog(Event $event)
+	public function log(Event $event)
 	{
 	    // Do some magic here...
 	}
@@ -92,6 +88,8 @@ $dispatcher->addSubscriber(new OrderLoggerSubscriber());
 
 // Dispatching event (this should be in your service layer)
 $dispatcher->dispatch('order.created', new OrderCreatedEvent());
+$dispatcher->dispatch('order.updated', new OrderUpdatedEvent());
+$dispatcher->dispatch('order.paid', new OrderPaidEvent());
 ```
 
 ## Bridges :recycle:
@@ -104,12 +102,12 @@ There are many bridges:
 
 | Nette                                               | Composer                                                                              | Description                                                   |
 |-----------------------------------------------------|---------------------------------------------------------------------------------------|---------------------------------------------------------------|
-| [Application](https://github.com/nette/application) | [`event-application-bridge`](https://github.com/contributte/event-application-bridge) | To track onRequest, onStartup and other application's events. |
-| [Security](https://github.com/nette/security)       | [`event-security-bridge`](https://github.com/contributte/event-security-bridge)       | To track onLogin and onLogout events.                         |
+| [Application](https://github.com/nette/application) | [`contributte/event-application-bridge`](https://github.com/contributte/event-application-bridge) | To track onRequest, onStartup and other application's events. |
+| [Security](https://github.com/nette/security)       | [`contributte/event-security-bridge`](https://github.com/contributte/event-security-bridge)       | To track onLogin and onLogout events.                         |
 
 Include all these bridges might be little bit boring (:cry:) and for that I have made an aggregation package. The `event-bridges`
 aggregate all of these nette bridges to one big bridge (:recycle:).
 
 ```
-composer require event-bridges
+composer require contributte/event-bridges
 ```
