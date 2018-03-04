@@ -26,7 +26,7 @@ composer require contributte/event-dispatcher
 
 | State       | Version | Branch   | PHP      |
 |-------------|---------|----------|----------|
-| stable      | `^0.3`  | `master` | `>= 5.6` |
+| stable      | `^0.4`  | `master` | `>= 5.6` |
 
 ## Overview
 
