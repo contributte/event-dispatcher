@@ -7,6 +7,7 @@ use Contributte\EventDispatcher\LazyEventDispatcher;
 use Nette\DI\CompilerExtension;
 use Nette\DI\ServiceCreationException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
@@ -30,15 +31,19 @@ class EventDispatcherExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$config = $this->validateConfig($this->defaults);
 
-		if ($this->isKdybyEventsRegistered()) {
-			if ($config['lazy'] === TRUE) {
-				$builder->addDefinition($this->prefix('dispatcher'))
-					->setClass(LazyEventDispatcher::class);
-			}
-			else {
-				$builder->addDefinition($this->prefix('dispatcher'))
-					->setClass(EventDispatcher::class);
-			}
+		$existingDispatcherServiceName = $builder->getByType(EventDispatcherInterface::class);
+
+		if ($existingDispatcherServiceName !== null) {
+			$builder->removeDefinition($existingDispatcherServiceName);
+		}
+
+		if ($config['lazy'] === TRUE) {
+			$builder->addDefinition($this->prefix('dispatcher'))
+				->setClass(LazyEventDispatcher::class);
+		}
+		else {
+			$builder->addDefinition($this->prefix('dispatcher'))
+				->setClass(EventDispatcher::class);
 		}
 	}
 
@@ -115,14 +120,6 @@ class EventDispatcherExtension extends CompilerExtension
 				}
 			}
 		}
-	}
-
-	/**
-	 * @return bool
-	 */
-	private function isKdybyEventsRegistered()
-	{
-		return (bool) $this->compiler->getExtensions('Kdyby\Events\DI\EventsExtension');
 	}
 
 }
