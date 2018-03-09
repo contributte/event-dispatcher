@@ -30,12 +30,15 @@ class EventDispatcherExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$config = $this->validateConfig($this->defaults);
 
-		if ($config['lazy'] === TRUE) {
-			$builder->addDefinition($this->prefix('dispatcher'))
-				->setClass(LazyEventDispatcher::class);
-		} else {
-			$builder->addDefinition($this->prefix('dispatcher'))
-				->setClass(EventDispatcher::class);
+		if ($this->isKdybyEventsRegistered()) {
+			if ($config['lazy'] === TRUE) {
+				$builder->addDefinition($this->prefix('dispatcher'))
+					->setClass(LazyEventDispatcher::class);
+			}
+			else {
+				$builder->addDefinition($this->prefix('dispatcher'))
+					->setClass(EventDispatcher::class);
+			}
 		}
 	}
 
@@ -112,6 +115,14 @@ class EventDispatcherExtension extends CompilerExtension
 				}
 			}
 		}
+	}
+
+	/**
+	 * @return bool
+	 */
+	private function isKdybyEventsRegistered()
+	{
+		return (bool) $this->compiler->getExtensions('Kdyby\Events\DI\EventsExtension');
 	}
 
 }
