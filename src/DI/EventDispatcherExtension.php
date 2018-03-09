@@ -7,6 +7,7 @@ use Contributte\EventDispatcher\LazyEventDispatcher;
 use Nette\DI\CompilerExtension;
 use Nette\DI\ServiceCreationException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @author Milan Felix Sulc <sulcmil@gmail.com>
@@ -30,10 +31,13 @@ class EventDispatcherExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$config = $this->validateConfig($this->defaults);
 
+		$this->unautowireExistingDispatchers();
+
 		if ($config['lazy'] === TRUE) {
 			$builder->addDefinition($this->prefix('dispatcher'))
 				->setClass(LazyEventDispatcher::class);
-		} else {
+		}
+		else {
 			$builder->addDefinition($this->prefix('dispatcher'))
 				->setClass(EventDispatcher::class);
 		}
@@ -111,6 +115,15 @@ class EventDispatcherExtension extends CompilerExtension
 					}
 				}
 			}
+		}
+	}
+
+	private function unautowireExistingDispatchers()
+	{
+		$builder = $this->getContainerBuilder();
+
+		foreach ($builder->findByType(EventDispatcherInterface::class) as $definition) {
+			$definition->setAutowired(FALSE);
 		}
 	}
 
