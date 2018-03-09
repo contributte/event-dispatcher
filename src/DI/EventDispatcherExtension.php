@@ -31,11 +31,7 @@ class EventDispatcherExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$config = $this->validateConfig($this->defaults);
 
-		$existingDispatcherServiceName = $builder->getByType(EventDispatcherInterface::class);
-
-		if ($existingDispatcherServiceName !== null) {
-			$builder->removeDefinition($existingDispatcherServiceName);
-		}
+		$this->unautowireExistingDispatchers();
 
 		if ($config['lazy'] === TRUE) {
 			$builder->addDefinition($this->prefix('dispatcher'))
@@ -119,6 +115,15 @@ class EventDispatcherExtension extends CompilerExtension
 					}
 				}
 			}
+		}
+	}
+
+	private function unautowireExistingDispatchers()
+	{
+		$builder = $this->getContainerBuilder();
+
+		foreach ($builder->findByType(EventDispatcherInterface::class) as $definition) {
+			$definition->setAutowired(FALSE);
 		}
 	}
 
