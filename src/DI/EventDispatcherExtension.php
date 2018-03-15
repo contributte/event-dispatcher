@@ -94,20 +94,24 @@ class EventDispatcherExtension extends CompilerExtension
 			 */
 			foreach ($events as $event => $args) {
 				if (is_string($args)) {
-					$dispatcher->addSetup('addSubscriberLazy', [$event, $name]);
-				} else if (is_string($args[0])) {
-					if (!method_exists($subscriber, $args[0])) {
-						throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', get_class($subscriber), $args[0]));
+					if (!method_exists($subscriber->getClass(), $args)) {
+						throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', $subscriber->getClass(), $args));
 					}
 
-					$dispatcher->addSetup('addSubscriberLazy', [$event, $args[0]]);
+					$dispatcher->addSetup('addSubscriberLazy', [$event, $name]);
+				} else if (is_string($args[0])) {
+					if (!method_exists($subscriber->getClass(), $args[0])) {
+						throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', $subscriber->getClass(), $args[0]));
+					}
+
+					$dispatcher->addSetup('addSubscriberLazy', [$event, $name]);
 				} else {
 					foreach ($args as $arg) {
-						if (!method_exists($subscriber, $arg[0])) {
-							throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', get_class($subscriber), $arg[0]));
+						if (!method_exists($subscriber->getClass(), $arg[0])) {
+							throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', $subscriber->getClass(), $arg[0]));
 						}
 
-						$dispatcher->addSetup('addSubscriberLazy', [$event, $arg[0]]);
+						$dispatcher->addSetup('addSubscriberLazy', [$event, $name]);
 					}
 				}
 			}

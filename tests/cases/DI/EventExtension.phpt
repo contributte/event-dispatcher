@@ -15,6 +15,7 @@ use Tester\Assert;
 use Tester\FileMock;
 use Tests\Fixtures\FooSubscriber;
 use Tests\Fixtures\MultiSubscriber;
+use Tests\Fixtures\PrioritizedSubscriber;
 
 require_once __DIR__ . '/../../bootstrap.php';
 
@@ -132,4 +133,36 @@ test(function () {
 	/** @var MultiSubscriber $subscriber */
 	$subscriber = $container->getByType(MultiSubscriber::class);
 	Assert::equal([$event1, $event2], $subscriber->onCall);
+});
+
+// Register prioritized subscriber
+test(function () {
+	$loader = new ContainerLoader(TEMP_DIR, TRUE);
+	$class = $loader->load(function (Compiler $compiler) {
+		$compiler->addExtension('events', new EventDispatcherExtension());
+		$compiler->loadConfig(FileMock::create('
+		services:
+			prioritized: Tests\Fixtures\PrioritizedSubscriber
+', 'neon'));
+	}, 5);
+
+	/** @var Container $container */
+	$container = new $class;
+
+	/** @var EventDispatcherInterface $em */
+	$em = $container->getByType(EventDispatcherInterface::class);
+
+	// Subscriber is not created
+	Assert::false($container->isCreated('prioritized'));
+
+	// Dispatch event
+	$event = new Event();
+	$em->dispatch('prioritized', $event);
+
+	// Subscriber is already created
+	Assert::true($container->isCreated('prioritized'));
+
+	/** @var PrioritizedSubscriber $subscriber */
+	$subscriber = $container->getByType(PrioritizedSubscriber::class);
+	Assert::equal([$event], $subscriber->onCall);
 });
