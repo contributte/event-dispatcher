@@ -26,6 +26,7 @@ composer require contributte/event-dispatcher
 
 | State       | Version | Branch   | PHP      |
 |-------------|---------|----------|----------|
+| development | `^0.5`  | `master` | `>= 5.6` |
 | stable      | `^0.4`  | `master` | `>= 5.6` |
 
 ## Overview
@@ -34,7 +35,7 @@ composer require contributte/event-dispatcher
 - [Configuration - how to configure](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#configuration-wrench)
 - [Subscriber - example subscriber](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#subscriber-bulb)
 - [Dispatcher - dispatching events](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#dispatcher-zap)
-- [Bridges - nette bridges](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#bridges-recycle)
+- [Extra - extra Nette bridge](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#extra-recycle)
 
 ## Maintainers
 

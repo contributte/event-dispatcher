@@ -6,7 +6,7 @@
 - [Configuration - how to configure](#configuration-wrench)
 - [Subscriber - example subscriber](#subscriber-bulb)
 - [Dispatcher - dispatching events](#dispatcher-zap)
-- [Bridges - nette bridges](#bridges-recycle)
+- [Extra - extra Nette bridge](#extra-recycle)
 
 ## Prologue
 
@@ -92,22 +92,10 @@ $dispatcher->dispatch('order.updated', new OrderUpdatedEvent());
 $dispatcher->dispatch('order.paid', new OrderPaidEvent());
 ```
 
-## Bridges :recycle:
+## Extra :recycle:
 
 The goal of this library is to be the most tiniest and purest adaptation of [Symfony Event-Dispatcher](https://github.com/symfony/event-dispatcher) to [Nette Framework](https://github.com/nette/).
 
-As you can see only one `Extension` class is provided. Nette has many single packages and here comes the bridges.
+As you can see only one `Extension` class is provided. Nette has many single packages and here comes the [`event-dispatcher-extra`](https://github.com/contributte/event-dispatcher-extra) package.
 
-There are many bridges:
-
-| Nette                                               | Composer                                                                              | Description                                                   |
-|-----------------------------------------------------|---------------------------------------------------------------------------------------|---------------------------------------------------------------|
-| [Application](https://github.com/nette/application) | [`contributte/event-application-bridge`](https://github.com/contributte/event-application-bridge) | To track onRequest, onStartup and other application's events. |
-| [Security](https://github.com/nette/security)       | [`contributte/event-security-bridge`](https://github.com/contributte/event-security-bridge)       | To track onLogin and onLogout events.                         |
-
-Include all these bridges might be little bit boring (:cry:) and for that I have made an aggregation package. The `event-bridges`
-aggregate all of these nette bridges to one big bridge (:recycle:).
-
-```
-composer require contributte/event-bridges
-```
+This extra repository contains useful events for **application**, **latte** and many others. [Take a look](https://github.com/contributte/event-dispatcher-extra).
