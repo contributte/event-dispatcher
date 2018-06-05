@@ -52,5 +52,10 @@
     "phpstan": [
       "temp/phpstan/vendor/bin/phpstan analyse -l 1 -c phpstan.neon src"
     ]
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-develop": "0.5.x-dev"
+    }
   }
 }
