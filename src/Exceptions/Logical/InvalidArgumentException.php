@@ -1,12 +1,9 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace Contributte\EventDispatcher\Exceptions\Logical;
 
 use Contributte\EventDispatcher\Exceptions\LogicalException;
 
-/**
- * @author Milan Felix Sulc <sulcmil@gmail.com>
- */
 class InvalidArgumentException extends LogicalException
 {
 

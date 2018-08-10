@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace Contributte\EventDispatcher;
 
@@ -6,34 +6,29 @@ use Contributte\EventDispatcher\Exceptions\Logical\InvalidStateException;
 use Nette\DI\Container;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * @author Milan Felix Sulc <sulcmil@gmail.com>
- */
 class LazyEventDispatcher extends EventDispatcher
 {
 
 	/** @var Container */
 	private $container;
 
-	/** @var array */
+	/** @var string[][] */
 	private $mapping = [];
 
-	/** @var array */
+	/** @var bool[] */
 	private $instanced = [];
 
-	/**
-	 * @param Container $container
-	 */
 	public function __construct(Container $container)
 	{
 		$this->container = $container;
 	}
 
 	/**
-	 * @param string|NULL $eventName
-	 * @return array
+	 * @param string|null $eventName
+	 * @return EventSubscriberInterface[]
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
 	 */
-	public function getListeners($eventName = NULL)
+	public function getListeners($eventName = null): array
 	{
 		if (isset($this->mapping[$eventName])) {
 			foreach ($this->mapping[$eventName] as $serviceName) {
@@ -52,7 +47,7 @@ class LazyEventDispatcher extends EventDispatcher
 				}
 
 				// Mark services as instanced
-				$this->instanced[$serviceName] = TRUE;
+				$this->instanced[$serviceName] = true;
 			}
 
 			// Unset already attached listeners
@@ -63,17 +58,8 @@ class LazyEventDispatcher extends EventDispatcher
 	}
 
 
-	/**
-	 * @param string $eventName
-	 * @param string $serviceName
-	 * @return void
-	 */
-	public function addSubscriberLazy($eventName, $serviceName)
+	public function addSubscriberLazy(string $eventName, string $serviceName): void
 	{
-		if (empty($this->mapping[$eventName])) {
-			$this->mapping[$eventName] = [];
-		}
-
 		$this->mapping[$eventName][] = $serviceName;
 	}
 

@@ -1,23 +1,20 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace Tests\Fixtures;
 
 use Contributte\EventDispatcher\EventSubscriber;
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * @author Milan Felix Sulc <sulcmil@gmail.com>
- */
 final class MultiSubscriber implements EventSubscriber
 {
 
-	/** @var array */
+	/** @var Event[] */
 	public $onCall = [];
 
 	/**
-	 * @return array The event names to listen to
+	 * @return mixed[] The event names to listen to
 	 */
-	public static function getSubscribedEvents()
+	public static function getSubscribedEvents(): array
 	{
 		return [
 			'multi.one' => 'onOne',
@@ -25,20 +22,12 @@ final class MultiSubscriber implements EventSubscriber
 		];
 	}
 
-	/**
-	 * @param Event $event
-	 * @return void
-	 */
-	public function onOne(Event $event)
+	public function onOne(Event $event): void
 	{
 		$this->onCall[] = $event;
 	}
 
-	/**
-	 * @param Event $event
-	 * @return void
-	 */
-	public function onTwo(Event $event)
+	public function onTwo(Event $event): void
 	{
 		$this->onCall[] = $event;
 	}

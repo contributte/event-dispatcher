@@ -61,7 +61,8 @@ use Symfony\Component\EventDispatcher\Event;
 
 final class OrderLoggerSubscriber implements EventSubscriber
 {
-	public static function getSubscribedEvents()
+
+	public static function getSubscribedEvents(): array
 	{
 		return [
 			'order.created' => 'log',
@@ -70,7 +71,7 @@ final class OrderLoggerSubscriber implements EventSubscriber
 		];
 	}
 
-	public function log(Event $event)
+	public function log(Event $event): void
 	{
 	    // Do some magic here...
 	}

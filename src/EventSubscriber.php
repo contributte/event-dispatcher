@@ -1,12 +1,9 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace Contributte\EventDispatcher;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * @author Milan Felix Sulc <sulcmil@gmail.com>
- */
 interface EventSubscriber extends EventSubscriberInterface
 {
 
