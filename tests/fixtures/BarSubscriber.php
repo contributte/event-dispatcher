@@ -1,32 +1,25 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace Tests\Fixtures;
 
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * @author Milan Felix Sulc <sulcmil@gmail.com>
- */
 final class BarSubscriber implements EventSubscriberInterface
 {
 
-	/** @var array */
+	/** @var Event[] */
 	public $onCall = [];
 
 	/**
-	 * @return array The event names to listen to
+	 * @return mixed[] The event names to listen to
 	 */
-	public static function getSubscribedEvents()
+	public static function getSubscribedEvents(): array
 	{
 		return ['baz' => 'onBaz'];
 	}
 
-	/**
-	 * @param Event $event
-	 * @return void
-	 */
-	public function onBaz(Event $event)
+	public function onBaz(Event $event): void
 	{
 		$this->onCall[] = $event;
 	}

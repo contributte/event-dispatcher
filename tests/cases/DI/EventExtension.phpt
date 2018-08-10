@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 /**
  * Test: DI\EventDispatcherExtensions
@@ -20,9 +20,9 @@ use Tests\Fixtures\PrioritizedSubscriber;
 require_once __DIR__ . '/../../bootstrap.php';
 
 // Dispatch event with NO defined subscriber
-test(function () {
-	$loader = new ContainerLoader(TEMP_DIR, TRUE);
-	$class = $loader->load(function (Compiler $compiler) {
+test(function (): void {
+	$loader = new ContainerLoader(TEMP_DIR, true);
+	$class = $loader->load(function (Compiler $compiler): void {
 		$compiler->addExtension('events', new EventDispatcherExtension());
 		$compiler->loadConfig(FileMock::create('
 		services:
@@ -31,7 +31,7 @@ test(function () {
 	}, 1);
 
 	/** @var Container $container */
-	$container = new $class;
+	$container = new $class();
 
 	/** @var EventDispatcherInterface $em */
 	$em = $container->getByType(EventDispatcherInterface::class);
@@ -51,9 +51,9 @@ test(function () {
 });
 
 // Dispatch event with defined subscriber
-test(function () {
-	$loader = new ContainerLoader(TEMP_DIR, TRUE);
-	$class = $loader->load(function (Compiler $compiler) {
+test(function (): void {
+	$loader = new ContainerLoader(TEMP_DIR, true);
+	$class = $loader->load(function (Compiler $compiler): void {
 		$compiler->addExtension('events', new EventDispatcherExtension());
 		$compiler->loadConfig(FileMock::create('
 		services:
@@ -62,7 +62,7 @@ test(function () {
 	}, 2);
 
 	/** @var Container $container */
-	$container = new $class;
+	$container = new $class();
 
 	/** @var EventDispatcherInterface $em */
 	$em = $container->getByType(EventDispatcherInterface::class);
@@ -83,9 +83,9 @@ test(function () {
 });
 
 // Register multiple subscribers
-test(function () {
-	$loader = new ContainerLoader(TEMP_DIR, TRUE);
-	$class = $loader->load(function (Compiler $compiler) {
+test(function (): void {
+	$loader = new ContainerLoader(TEMP_DIR, true);
+	$class = $loader->load(function (Compiler $compiler): void {
 		$compiler->addExtension('events', new EventDispatcherExtension());
 		$compiler->loadConfig(FileMock::create('
 		services:
@@ -95,15 +95,15 @@ test(function () {
 	}, 3);
 
 	/** @var Container $container */
-	$container = new $class;
+	$container = new $class();
 
 	Assert::count(2, $container->findByType(EventSubscriberInterface::class));
 });
 
 // Register subscriber with more events
-test(function () {
-	$loader = new ContainerLoader(TEMP_DIR, TRUE);
-	$class = $loader->load(function (Compiler $compiler) {
+test(function (): void {
+	$loader = new ContainerLoader(TEMP_DIR, true);
+	$class = $loader->load(function (Compiler $compiler): void {
 		$compiler->addExtension('events', new EventDispatcherExtension());
 		$compiler->loadConfig(FileMock::create('
 		services:
@@ -112,7 +112,7 @@ test(function () {
 	}, 4);
 
 	/** @var Container $container */
-	$container = new $class;
+	$container = new $class();
 
 	/** @var EventDispatcherInterface $em */
 	$em = $container->getByType(EventDispatcherInterface::class);
@@ -136,9 +136,9 @@ test(function () {
 });
 
 // Register prioritized subscriber
-test(function () {
-	$loader = new ContainerLoader(TEMP_DIR, TRUE);
-	$class = $loader->load(function (Compiler $compiler) {
+test(function (): void {
+	$loader = new ContainerLoader(TEMP_DIR, true);
+	$class = $loader->load(function (Compiler $compiler): void {
 		$compiler->addExtension('events', new EventDispatcherExtension());
 		$compiler->loadConfig(FileMock::create('
 		services:
@@ -147,7 +147,7 @@ test(function () {
 	}, 5);
 
 	/** @var Container $container */
-	$container = new $class;
+	$container = new $class();
 
 	/** @var EventDispatcherInterface $em */
 	$em = $container->getByType(EventDispatcherInterface::class);
