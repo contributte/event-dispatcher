@@ -7,7 +7,7 @@
 - [Subscriber - example subscriber](#subscriber-bulb)
 - [Dispatcher - dispatching events](#dispatcher-zap)
 - [Extra - extra Nette bridge](#extra-recycle)
-- [Kdyby compatibility](#kdyby-compatibility)
+- [Compatibility](#compatibility)
 
 ## Prologue
 
@@ -102,7 +102,11 @@ As you can see only one `Extension` class is provided. Nette has many single pac
 
 This extra repository contains useful events for **application**, **latte** and many others. [Take a look](https://github.com/contributte/event-dispatcher-extra).
 
-## Kdyby compatibility
+## Compatibility
+
+How to make this extension work with other Symfony/EventDispatcher implementations.
+
+### Kdyby/Events
 
 Kdyby/Events has a conflict with this package because of it's `SymfonyDispatcher` proxy class. To avoid the conflict simply add this to your config.neon:
 
