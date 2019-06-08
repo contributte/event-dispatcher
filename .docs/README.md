@@ -59,7 +59,7 @@ events:
 
 ```php
 use Contributte\EventDispatcher\EventSubscriber;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 final class OrderLoggerSubscriber implements EventSubscriber
 {
@@ -85,6 +85,8 @@ final class OrderLoggerSubscriber implements EventSubscriber
 This little snippet explain the cycle of event dispatcher.
 
 ```php
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
 $dispatcher = new EventDispatcher();
 
 // Register subscriber (this happens automatically during DIC compile time)
