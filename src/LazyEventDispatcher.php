@@ -20,6 +20,7 @@ class LazyEventDispatcher extends EventDispatcher
 
 	public function __construct(Container $container)
 	{
+		parent::__construct();
 		$this->container = $container;
 	}
 

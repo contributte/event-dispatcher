@@ -1,12 +1,12 @@
-# Event Dispatcher
+# Contributte Event Dispatcher
 
-## Content :gift:
+## Content
 
-- [Usage - how to register](#usage-tada)
-- [Configuration - how to configure](#configuration-wrench)
-- [Subscriber - example subscriber](#subscriber-bulb)
-- [Dispatcher - dispatching events](#dispatcher-zap)
-- [Extra - extra Nette bridge](#extra-recycle)
+- [Setup](#setup)
+- [Configuration](#configuration)
+- [Subscriber - example subscriber](#subscriber)
+- [Dispatcher - dispatching events](#dispatcher)
+- [Extra - extra Nette bridge](#extra)
 - [Compatibility](#compatibility)
 
 ## Prologue
@@ -21,9 +21,11 @@ Please take a look at official documentation: https://symfony.com/doc/current/co
 
 **Dispatcher** is manager class that tracks all listeners and thru `dispatch` method emits all events.
 
-## Usage :tada:
+## Setup
 
-At first we need to register this extension.
+```bash
+composer require contributte/event-dispatcher
+```
 
 ```yaml
 extensions:
@@ -33,7 +35,7 @@ extensions:
 The extension looks for all services implementing `Symfony\Component\EventDispatcher\EventSubscriberInterface`. 
 And automatically adds them to the event dispatcher. That's all. You don't have to be worried.
 
-## Configuration :wrench:
+## Configuration
 
 ### Autoload
 
@@ -53,7 +55,7 @@ events:
     lazy: true/false
 ```
 
-## Subscriber :bulb:
+## Subscriber
 
 ```php
 use Contributte\EventDispatcher\EventSubscriber;
@@ -78,7 +80,7 @@ final class OrderLoggerSubscriber implements EventSubscriber
 }
 ```
 
-## Dispatcher :zap:
+## Dispatcher
 
 This little snippet explain the cycle of event dispatcher.
 
@@ -94,7 +96,7 @@ $dispatcher->dispatch('order.updated', new OrderUpdatedEvent());
 $dispatcher->dispatch('order.paid', new OrderPaidEvent());
 ```
 
-## Extra :recycle:
+## Extra
 
 The goal of this library is to be the most tiniest and purest adaptation of [Symfony Event-Dispatcher](https://github.com/symfony/event-dispatcher) to [Nette Framework](https://github.com/nette/).
 

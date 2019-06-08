@@ -1,8 +1,6 @@
-# Event Dispatcher
+# Contributte Event Dispatcher
 
 Ultra easy-to-use [`Symfony\EventDispatcher`](https://github.com/symfony/event-dispatcher) for [`Nette Framework`](https://github.com/nette/).
-
------
 
 [![Build Status](https://img.shields.io/travis/contributte/event-dispatcher.svg?style=flat-square)](https://travis-ci.org/contributte/event-dispatcher)
 [![Code coverage](https://img.shields.io/coveralls/contributte/event-dispatcher.svg?style=flat-square)](https://coveralls.io/r/contributte/event-dispatcher)
@@ -10,17 +8,20 @@ Ultra easy-to-use [`Symfony\EventDispatcher`](https://github.com/symfony/event-d
 [![Downloads this Month](https://img.shields.io/packagist/dm/contributte/event-dispatcher.svg?style=flat-square)](https://packagist.org/packages/contributte/event-dispatcher)
 [![Downloads total](https://img.shields.io/packagist/dt/contributte/event-dispatcher.svg?style=flat-square)](https://packagist.org/packages/contributte/event-dispatcher)
 [![Latest stable](https://img.shields.io/packagist/v/contributte/event-dispatcher.svg?style=flat-square)](https://packagist.org/packages/contributte/event-dispatcher)
-[![PHPStan](https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat)](https://github.com/phpstan/phpstan)
+[![PHPStan](https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat-square)](https://github.com/phpstan/phpstan)
 
 ## Discussion / Help
 
 [![Join the chat](https://img.shields.io/gitter/room/contributte/contributte.svg?style=flat-square)](http://bit.ly/ctteg)
 
-## Install
+## Documentation
 
-```
-composer require contributte/event-dispatcher
-```
+- [Setup](.docs/README.md#setup)
+- [Configuration](.docs/README.md#configuration)
+- [Subscriber - example subscriber](.docs/README.md#subscriber)
+- [Dispatcher - dispatching events](.docs/README.md#dispatcher)
+- [Extra - extra Nette bridge](.docs/README.md#extra)
+- [Compatibility](.docs/README.md#compatibility)
 
 ## Versions
 
@@ -29,14 +30,6 @@ composer require contributte/event-dispatcher
 | development | `^0.6`  | `master` | `>= 7.1` |
 | stable      | `^0.5`  | `master` | `>= 7.1` |
 | stable      | `^0.4`  | `master` | `>= 5.6` |
-
-## Overview
-
-- [Usage - how to register](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#usage-tada)
-- [Configuration - how to configure](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#configuration-wrench)
-- [Subscriber - example subscriber](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#subscriber-bulb)
-- [Dispatcher - dispatching events](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#dispatcher-zap)
-- [Extra - extra Nette bridge](https://github.com/contributte/event-dispatcher/blob/master/.docs/README.md#extra-recycle)
 
 ## Maintainers
 
@@ -60,7 +53,5 @@ composer require contributte/event-dispatcher
     </tr>
   </tbody>
 </table>
-
----
 
 Thank you for testing, reporting and contributing.
