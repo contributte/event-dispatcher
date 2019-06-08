@@ -1,10 +1,4 @@
-includes:
-	- temp/phpstan/vendor/phpstan/phpstan-deprecation-rules/rules.neon
-	- temp/phpstan/vendor/phpstan/phpstan-nette/extension.neon
-	- temp/phpstan/vendor/phpstan/phpstan-nette/rules.neon
-	- temp/phpstan/vendor/phpstan/phpstan-strict-rules/rules.neon
-
 parameters:
 	ignoreErrors:
-		# Probably cannot occur
-		- '#^Parameter \#1 \$function of function call_user_func expects callable, array\(array\|Nette\\DI\\ServiceDefinition\|string\|null#'
+		# phpstan don't like array callbacks
+		- '#^Parameter \#1 \$function of function call_user_func expects callable\(\)\: mixed, array\(.+\) given\.$#'
