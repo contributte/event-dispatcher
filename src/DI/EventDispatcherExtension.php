@@ -5,17 +5,27 @@ namespace Contributte\EventDispatcher\DI;
 use Contributte\EventDispatcher\EventDispatcher;
 use Contributte\EventDispatcher\LazyEventDispatcher;
 use Nette\DI\CompilerExtension;
+use Nette\DI\Definitions\ServiceDefinition;
 use Nette\DI\ServiceCreationException;
+use Nette\Schema\Expect;
+use Nette\Schema\Schema;
+use stdClass;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * @property-read stdClass $config
+ */
 class EventDispatcherExtension extends CompilerExtension
 {
 
-	/** @var mixed[] */
-	private $defaults = [
-		'lazy' => true,
-		'autoload' => true,
-	];
+	public function getConfigSchema(): Schema
+	{
+		return Expect::structure([
+			'lazy' => Expect::bool(true),
+			'autoload' => Expect::bool(true),
+		]);
+	}
 
 	/**
 	 * Register services
@@ -23,14 +33,17 @@ class EventDispatcherExtension extends CompilerExtension
 	public function loadConfiguration(): void
 	{
 		$builder = $this->getContainerBuilder();
-		$config = $this->validateConfig($this->defaults);
+		$config = $this->config;
 
-		if ($config['lazy'] === true) {
-			$builder->addDefinition($this->prefix('dispatcher'))
-				->setType(LazyEventDispatcher::class);
+		$eventDispatcherDefinition = $builder->addDefinition($this->prefix('dispatcher'))
+			->setType(EventDispatcherInterface::class);
+
+		if ($config->lazy === true) {
+			$eventDispatcherDefinition
+				->setFactory(LazyEventDispatcher::class);
 		} else {
-			$builder->addDefinition($this->prefix('dispatcher'))
-				->setType(EventDispatcher::class);
+			$eventDispatcherDefinition
+				->setFactory(EventDispatcher::class);
 		}
 	}
 
@@ -39,10 +52,10 @@ class EventDispatcherExtension extends CompilerExtension
 	 */
 	public function beforeCompile(): void
 	{
-		$config = $this->validateConfig($this->defaults);
+		$config = $this->config;
 
-		if ($config['autoload'] === true) {
-			if ($config['lazy'] === true) {
+		if ($config->autoload === true) {
+			if ($config->lazy === true) {
 				$this->doBeforeCompileLaziness();
 			} else {
 				$this->doBeforeCompile();
@@ -57,6 +70,7 @@ class EventDispatcherExtension extends CompilerExtension
 	{
 		$builder = $this->getContainerBuilder();
 		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
+		assert($dispatcher instanceof ServiceDefinition);
 
 		$subscribers = $builder->findByType(EventSubscriberInterface::class);
 		foreach ($subscribers as $name => $subscriber) {
@@ -71,9 +85,11 @@ class EventDispatcherExtension extends CompilerExtension
 	{
 		$builder = $this->getContainerBuilder();
 		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
+		assert($dispatcher instanceof ServiceDefinition);
 
 		$subscribers = $builder->findByType(EventSubscriberInterface::class);
 		foreach ($subscribers as $name => $subscriber) {
+			assert($subscriber instanceof ServiceDefinition);
 			$events = call_user_func([$subscriber->getEntity(), 'getSubscribedEvents']);
 
 			/**
