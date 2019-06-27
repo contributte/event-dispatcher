@@ -58,10 +58,10 @@ events:
 ## Subscriber
 
 ```php
-use Contributte\EventDispatcher\EventSubscriber;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class OrderLoggerSubscriber implements EventSubscriber
+final class OrderLoggerSubscriber implements EventSubscriberInterface
 {
 
 	public static function getSubscribedEvents(): array

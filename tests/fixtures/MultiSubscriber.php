@@ -2,10 +2,10 @@
 
 namespace Tests\Fixtures;
 
-use Contributte\EventDispatcher\EventSubscriber;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class MultiSubscriber implements EventSubscriber
+final class MultiSubscriber implements EventSubscriberInterface
 {
 
 	/** @var Event[] */
