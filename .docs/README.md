@@ -67,9 +67,9 @@ final class OrderLoggerSubscriber implements EventSubscriberInterface
 	public static function getSubscribedEvents(): array
 	{
 		return [
-			'order.created' => 'log',
-			'order.updated' => 'log',
-			'order.paid' => 'log',
+			OrderCreatedEvent::class => 'log',
+			OrderUpdatedEvent::class => 'log',
+			OrderPaidEvent::class => 'log',
 		];
 	}
 
@@ -93,9 +93,9 @@ $dispatcher = new EventDispatcher();
 $dispatcher->addSubscriber(new OrderLoggerSubscriber());
 
 // Dispatching event (this should be in your service layer)
-$dispatcher->dispatch('order.created', new OrderCreatedEvent());
-$dispatcher->dispatch('order.updated', new OrderUpdatedEvent());
-$dispatcher->dispatch('order.paid', new OrderPaidEvent());
+$dispatcher->dispatch(new OrderCreatedEvent());
+$dispatcher->dispatch(new OrderUpdatedEvent());
+$dispatcher->dispatch(new OrderPaidEvent());
 ```
 
 ## Extra
