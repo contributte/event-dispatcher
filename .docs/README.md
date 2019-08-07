@@ -11,7 +11,7 @@
 
 ## Prologue
 
-`Contributte/EventDispatcher` brings `Symfony\EventDispatcher` to your Nette applications. 
+`Contributte/EventDispatcher` brings `Symfony/EventDispatcher` to your Nette applications. 
 
 Please take a look at official documentation: https://symfony.com/doc/current/components/event_dispatcher.html
 
@@ -78,6 +78,11 @@ final class OrderLoggerSubscriber implements EventSubscriberInterface
 	    // Do some magic here...
 	}
 }
+```
+
+```yml
+services:
+  - OrderLoggerSubscriber
 ```
 
 ## Dispatcher
