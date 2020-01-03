@@ -8,9 +8,9 @@ use Contributte\EventDispatcher\DI\EventDispatcherExtension;
 use Nette\DI\Compiler;
 use Nette\DI\Container;
 use Nette\DI\ContainerLoader;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 use Tester\Assert;
 use Tester\FileMock;
 use Tests\Fixtures\FooSubscriber;
@@ -40,7 +40,7 @@ test(function (): void {
 	Assert::false($container->isCreated('foo'));
 
 	// Dispatch event
-	$em->dispatch('baz.baz', new Event());
+	$em->dispatch(new Event(), 'baz.baz');
 
 	// Subscriber is still not created
 	Assert::false($container->isCreated('foo'));
@@ -72,7 +72,7 @@ test(function (): void {
 
 	// Dispatch event
 	$event = new Event();
-	$em->dispatch('foobar', $event);
+	$em->dispatch($event, 'foobar');
 
 	// Subscriber is already created
 	Assert::true($container->isCreated('foo'));
@@ -122,10 +122,10 @@ test(function (): void {
 
 	// Dispatch event
 	$event1 = new Event();
-	$em->dispatch('multi.one', $event1);
+	$em->dispatch($event1, 'multi.one');
 
 	$event2 = new Event();
-	$em->dispatch('multi.two', $event2);
+	$em->dispatch($event2, 'multi.two');
 
 	// Subscriber is already created
 	Assert::true($container->isCreated('multi'));
@@ -157,7 +157,7 @@ test(function (): void {
 
 	// Dispatch event
 	$event = new Event();
-	$em->dispatch('prioritized', $event);
+	$em->dispatch($event, 'prioritized');
 
 	// Subscriber is already created
 	Assert::true($container->isCreated('prioritized'));

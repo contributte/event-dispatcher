@@ -2,8 +2,8 @@
 
 namespace Tests\Fixtures;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 final class PrioritizedSubscriber implements EventSubscriberInterface
 {
