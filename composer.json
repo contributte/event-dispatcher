@@ -20,7 +20,7 @@
   "require": {
     "php": "^7.2",
     "nette/di": "^3.0.0",
-    "symfony/event-dispatcher": "^4.3.1"
+    "symfony/event-dispatcher": "^4.3.1|^5.0.0"
   },
   "require-dev": {
     "ninjify/nunjuck": "^0.2.0",
