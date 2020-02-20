@@ -87,20 +87,29 @@ services:
 
 ## Dispatcher
 
-This little snippet explain the cycle of event dispatcher.
+Get dispatcher from DI and dispatch your events
 
 ```php
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-$dispatcher = new EventDispatcher();
+class OrderModel
+{
 
-// Register subscriber (this happens automatically during DIC compile time)
-$dispatcher->addSubscriber(new OrderLoggerSubscriber());
+	/** @var EventDispatcherInterface */
+	private $eventDispatcher;
 
-// Dispatching event (this should be in your service layer)
-$dispatcher->dispatch(new OrderCreatedEvent());
-$dispatcher->dispatch(new OrderUpdatedEvent());
-$dispatcher->dispatch(new OrderPaidEvent());
+	public function __construct(EventDispatcherInterface $eventDispatcher)
+	{
+		$this->eventDispatcher = $eventDispatcher;
+	}
+
+	public function createOrder(Order $order): void 
+	{
+		// Create order
+		$this->eventDispatcher->dispatch(new OrderCreatedEvent($order));
+	}
+
+}
 ```
 
 ## Extra
