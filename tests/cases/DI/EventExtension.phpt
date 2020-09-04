@@ -70,6 +70,12 @@ test(function (): void {
 	// Subscriber is not created
 	Assert::false($container->isCreated('foo'));
 
+	// Dispatcher has some listeners
+	Assert::true($em->hasListeners());
+
+	// Dispatcher has listeners for foobar event
+	Assert::true($em->hasListeners('foobar'));
+
 	// Dispatch event
 	$event = new Event();
 	$em->dispatch($event, 'foobar');

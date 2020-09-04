@@ -64,4 +64,28 @@ class LazyEventDispatcher extends EventDispatcher
 		$this->mapping[$eventName][] = $serviceName;
 	}
 
+	/**
+	 * @param string|null $eventName
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
+	 */
+	public function hasListeners($eventName = null): bool
+	{
+		// check if event name is specified and has some lazy subscriber
+		if ($eventName !== null && isset($this->mapping[$eventName])) {
+			return true;
+		}
+
+		// check if any lazy subscriber exists
+		if ($eventName === null) {
+			foreach ($this->mapping as $serviceName) {
+				if ($serviceName) {
+					return true;
+				}
+			}
+		}
+
+		// defer to default implementation
+		return parent::hasListeners($eventName);
+	}
+
 }
