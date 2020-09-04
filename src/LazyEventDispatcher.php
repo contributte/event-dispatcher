@@ -78,9 +78,7 @@ class LazyEventDispatcher extends EventDispatcher
 		// check if any lazy subscriber exists
 		if ($eventName === null) {
 			foreach ($this->mapping as $serviceName) {
-				if ($serviceName) {
-					return true;
-				}
+				return true;
 			}
 		}
 

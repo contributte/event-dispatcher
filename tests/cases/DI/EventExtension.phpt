@@ -19,7 +19,7 @@ use Tests\Fixtures\PrioritizedSubscriber;
 
 require_once __DIR__ . '/../../bootstrap.php';
 
-// Dispatch event with NO defined subscriber
+// Dispatch event with NO defined subscriber for event
 test(function (): void {
 	$loader = new ContainerLoader(TEMP_DIR, true);
 	$class = $loader->load(function (Compiler $compiler): void {
@@ -38,6 +38,12 @@ test(function (): void {
 
 	// Subscriber is not created
 	Assert::false($container->isCreated('foo'));
+
+	// Dispatcher has some listeners
+	Assert::true($em->hasListeners());
+
+	// Dispatcher has no listeners for event
+	Assert::false($em->hasListeners('baz.baz'));
 
 	// Dispatch event
 	$em->dispatch(new Event(), 'baz.baz');
@@ -82,6 +88,12 @@ test(function (): void {
 
 	// Subscriber is already created
 	Assert::true($container->isCreated('foo'));
+
+	// Dispatcher has some listeners after instantiation
+	Assert::true($em->hasListeners());
+
+	// Dispatcher has listeners for foobar event after instantiation
+	Assert::true($em->hasListeners('foobar'));
 
 	/** @var FooSubscriber $subscriber */
 	$subscriber = $container->getByType(FooSubscriber::class);
@@ -171,4 +183,22 @@ test(function (): void {
 	/** @var PrioritizedSubscriber $subscriber */
 	$subscriber = $container->getByType(PrioritizedSubscriber::class);
 	Assert::equal([$event], $subscriber->onCall);
+});
+
+// Dispatch event with NO subscribers at all
+test(function (): void {
+	$loader = new ContainerLoader(TEMP_DIR, true);
+	$class = $loader->load(function (Compiler $compiler): void {
+		$compiler->addExtension('events', new EventDispatcherExtension());
+		$compiler->loadConfig(FileMock::create('', 'neon'));
+	}, 6);
+
+	/** @var Container $container */
+	$container = new $class();
+
+	/** @var EventDispatcherInterface $em */
+	$em = $container->getByType(EventDispatcherInterface::class);
+
+	// Dispatcher has no listeners
+	Assert::false($em->hasListeners());
 });
