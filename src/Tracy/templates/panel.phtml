@@ -1,0 +1,85 @@
+<?php
+
+/** @var EventInfo[] $events */
+/** @var array<string,callable> $listeners */
+/** @var int $handledCount */
+
+/** @var float $totalTime */
+
+use Contributte\EventDispatcher\Diagnostics\EventInfo;
+use Tracy\Dumper;
+
+?>
+<style>
+    #tracy-debug .event-name, #tracy-debug .listener-name {
+        font-weight: bold;
+    }
+
+    #tracy-debug .listeners {
+        list-style: none;
+    }
+</style>
+<?php if ($handledCount === 0): ?>
+    <h1>No events handled</h1>
+<?php else: ?>
+    <h1>Events:
+		<?= $handledCount ?>,
+        time:
+		<?= $totalTime ? sprintf('%0.3f', $totalTime * 1000) : ''; ?> ms
+    </h1>
+<?php endif; ?>
+
+<div class="tracy-inner">
+    <div class="tracy-inner-container">
+		<?php if ($events !== []): ?>
+            <table class="tracy-sortable">
+                <tr>
+                    <th>Time&nbsp;ms</th>
+                    <th>Handled</th>
+                    <th>Event</th>
+                </tr>
+
+				<?php foreach ($events as $e): ?>
+                    <tr>
+                        <td>
+							<?= sprintf('%0.2f', $e->duration * 1000); ?>
+                        </td>
+                        <td><?= $e->handled ? 'yes' : 'no' ?></td>
+                        <td>
+							<?= Dumper::toHtml($e->event, [Dumper::COLLAPSE => true]); ?>
+                        </td>
+                    </tr>
+				<?php endforeach; ?>
+            </table>
+		<?php endif; ?>
+
+        <div style="margin-top: 2px;">
+            Listeners
+            <table>
+                <tr>
+                    <th>Event</th>
+                    <th>Listeners</th>
+                </tr>
+
+				<?php foreach ($listeners as $eventName => $listen): ?>
+					<?php foreach ($listen as $i => $handler): ?>
+                        <tr>
+                            <?php if ($i === 0): ?>
+                            <td rowspan="<?= count($listen) ?>"><code class="event-name"><?= $eventName ?></code></td>
+                            <?php endif; ?>
+                            <td class="listener-name">
+								<?=
+								(\is_object($handler[0]) && \is_string($handler[1]))
+									? \get_class($handler[0]) . '::' . $handler[1]
+									: Dumper::toHtml($handler);
+								?>
+                            </td>
+                        </tr>
+					<?php endforeach; ?>
+				<?php endforeach; ?>
+            </table>
+
+			<?= Dumper::toHtml($listeners, [Dumper::COLLAPSE => true]); ?>
+        </div>
+    </div>
+</div>

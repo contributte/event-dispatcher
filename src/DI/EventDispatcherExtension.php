@@ -2,11 +2,14 @@
 
 namespace Contributte\EventDispatcher\DI;
 
+use Contributte\EventDispatcher\Diagnostics\DiagnosticDispatcher;
 use Contributte\EventDispatcher\EventDispatcher;
 use Contributte\EventDispatcher\LazyEventDispatcher;
+use Contributte\EventDispatcher\Tracy\Panel;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\ServiceDefinition;
 use Nette\DI\ServiceCreationException;
+use Nette\PhpGenerator\ClassType;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use stdClass;
@@ -21,10 +24,14 @@ class EventDispatcherExtension extends CompilerExtension
 
 	public function getConfigSchema(): Schema
 	{
-		return Expect::structure([
-			'lazy' => Expect::bool(true),
-			'autoload' => Expect::bool(true),
-		]);
+		return Expect::structure(
+			[
+				'lazy' => Expect::bool(true),
+				'autoload' => Expect::bool(true),
+				'debug' => Expect::bool(false),
+				'logger' => Expect::string(null),
+			]
+		);
 	}
 
 	/**
@@ -44,6 +51,33 @@ class EventDispatcherExtension extends CompilerExtension
 		} else {
 			$eventDispatcherDefinition
 				->setFactory(EventDispatcher::class);
+		}
+
+		if (!$this->config->debug && $this->config->logger === null) {
+			return;
+		}
+
+		$wrapped = $builder->addDefinition($this->prefix('wrappedOriginal'))
+			->setAutowired(false)
+			->setFactory($eventDispatcherDefinition->getFactory());
+
+		$eventDispatcherDefinition->setFactory(DiagnosticDispatcher::class, [$wrapped]);
+
+		if ($this->config->debug) {
+			$tracyPanel = $builder->addDefinition($this->prefix('tracyPanel'))
+				->setFactory(Panel::class);
+
+			$eventDispatcherDefinition->addSetup('setPanel', [$tracyPanel]);
+		}
+
+		if ($this->config->logger !== null) {
+			$eventDispatcherDefinition->addSetup(
+				'setLogger',
+				[
+				$this->config->logger,
+				$this->prefix('logger'),
+				]
+			);
 		}
 	}
 
@@ -120,6 +154,17 @@ class EventDispatcherExtension extends CompilerExtension
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * Initialize Tracy panel
+	 */
+	public function afterCompile(ClassType $class): void
+	{
+		if ($this->config->debug) {
+			$initialize = $class->getMethod('initialize');
+			$initialize->addBody('$this->getService(?)->addPanel($this->getService(?));', ['tracy.bar', $this->prefix('tracyPanel')]);
 		}
 	}
 
