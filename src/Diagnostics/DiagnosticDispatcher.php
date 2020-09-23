@@ -6,8 +6,6 @@ use Contributte\EventDispatcher\Tracy\Panel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Tracy\Debugger;
-use function spl_object_hash;
 
 class DiagnosticDispatcher implements EventDispatcherInterface
 {
@@ -79,13 +77,12 @@ class DiagnosticDispatcher implements EventDispatcherInterface
 			$this->logger->debug(sprintf('Dispatching event %s', $info->name), ['event' => $info]);
 		}
 
-		$timerName = 'event-' . spl_object_hash($event);
-		Debugger::timer($timerName);
+		$start = microtime(true);
 		$return = $this->original->dispatch($event, $eventName);
 		if ($this->original->hasListeners($info->name)) {
 			$info->handled = true;
 		}
-		$info->duration = Debugger::timer($timerName);
+		$info->duration = microtime(true) - $start;
 
 		if ($this->logger !== null) {
 			$this->logger->debug(sprintf('Dispatched event %s', $info->name), ['event' => $info]);
