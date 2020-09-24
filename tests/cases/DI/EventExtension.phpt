@@ -10,6 +10,7 @@ use Contributte\EventDispatcher\Diagnostics\EventInfo;
 use Nette\DI\Compiler;
 use Nette\DI\Container;
 use Nette\DI\ContainerLoader;
+use Psr\Log\Test\TestLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -189,7 +190,7 @@ test(function (): void {
 	$em = $container->getByType(EventDispatcherInterface::class);
 	Assert::type(DiagnosticDispatcher::class, $em);
 	/** @var DiagnosticDispatcher $em */
-	$logger = new \Psr\Log\Test\TestLogger();
+	$logger = new TestLogger();
 	$em->setLogger($logger);
 
 	// Dispatch subscribed event
