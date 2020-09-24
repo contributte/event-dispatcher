@@ -3,6 +3,7 @@
 namespace Contributte\EventDispatcher\Diagnostics;
 
 use Contributte\EventDispatcher\Tracy\Panel;
+use Nette\Utils\ObjectHelpers;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -33,6 +34,20 @@ class DiagnosticDispatcher implements EventDispatcherInterface
 	public function setLogger(LoggerInterface $logger): void
 	{
 		$this->logger = $logger;
+	}
+
+	/**
+	 * @param mixed[] $args
+	 * @return mixed
+	 */
+	public function __call(string $name, array $args)
+	{
+		if (method_exists($this->original, $name)) {
+			$callable = [$this->original, $name];
+			assert(is_callable($callable));
+			return call_user_func_array($callable, $args);
+		}
+		ObjectHelpers::strictCall(get_class($this->original), $name);
 	}
 
 	/**

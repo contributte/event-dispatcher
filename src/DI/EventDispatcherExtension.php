@@ -24,14 +24,12 @@ class EventDispatcherExtension extends CompilerExtension
 
 	public function getConfigSchema(): Schema
 	{
-		return Expect::structure(
-			[
-				'lazy' => Expect::bool(true),
-				'autoload' => Expect::bool(true),
-				'debug' => Expect::bool(false),
-				'logger' => Expect::string(null),
-			]
-		);
+		return Expect::structure([
+			'lazy' => Expect::bool(true),
+			'autoload' => Expect::bool(true),
+			'debug' => Expect::bool(false),
+			'logger' => Expect::string(null),
+		]);
 	}
 
 	/**
