@@ -2,7 +2,6 @@
 
 namespace Contributte\EventDispatcher\Diagnostics;
 
-use Contributte\EventDispatcher\Tracy\Panel;
 use Nette\Utils\ObjectHelpers;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -11,29 +10,27 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class DiagnosticDispatcher implements EventDispatcherInterface
 {
 
+	public const DISPATCHING = 'Dispatching event';
+
 	/** @var EventDispatcherInterface */
 	private $original;
 
-	/** @var Panel|null */
-	private $panel = null;
-
-	/** @var LoggerInterface|null */
-	private $logger = null;
+	/** @var LoggerInterface[] */
+	private $loggers = [];
 
 	public function __construct(EventDispatcherInterface $original)
 	{
 		$this->original = $original;
 	}
 
-	public function setPanel(Panel $panel): void
+	public function addLogger(LoggerInterface $logger): void
 	{
-		$this->panel = $panel;
-		$panel->setDispatcher($this);
+		$this->loggers[] = $logger;
 	}
 
-	public function setLogger(LoggerInterface $logger): void
+	public function clearLoggers(): void
 	{
-		$this->logger = $logger;
+		$this->loggers = [];
 	}
 
 	/**
@@ -85,11 +82,8 @@ class DiagnosticDispatcher implements EventDispatcherInterface
 	public function dispatch(object $event, ?string $eventName = null): object
 	{
 		$info = new EventInfo($event, $eventName);
-		if ($this->panel !== null) {
-			$this->panel->dispatch($info);
-		}
-		if ($this->logger !== null) {
-			$this->logger->debug(sprintf('Dispatching event %s', $info->name), ['event' => $info]);
+		foreach ($this->loggers as $logger) {
+			$logger->debug(sprintf(self::DISPATCHING . ' "%s"', $info->name), ['event' => $info]);
 		}
 
 		$start = microtime(true);
@@ -99,8 +93,8 @@ class DiagnosticDispatcher implements EventDispatcherInterface
 		}
 		$info->duration = microtime(true) - $start;
 
-		if ($this->logger !== null) {
-			$this->logger->debug(sprintf('Dispatched event %s', $info->name), ['event' => $info]);
+		foreach ($this->loggers as $logger) {
+			$logger->debug(sprintf('Dispatched event %s', $info->name), ['event' => $info]);
 		}
 
 		return $return;

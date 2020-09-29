@@ -15,6 +15,7 @@ use Nette\Schema\Schema;
 use stdClass;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Tracy\IBarPanel;
 
 /**
  * @property-read stdClass $config
@@ -44,36 +45,34 @@ class EventDispatcherExtension extends CompilerExtension
 			->setType(EventDispatcherInterface::class);
 
 		if ($config->lazy === true) {
-			$eventDispatcherDefinition
-				->setFactory(LazyEventDispatcher::class);
+			$factory = LazyEventDispatcher::class;
 		} else {
-			$eventDispatcherDefinition
-				->setFactory(EventDispatcher::class);
+			$factory = EventDispatcher::class;
 		}
 
-		if (!$this->config->debug && $this->config->logger === null) {
-			return;
+		if ($this->config->debug || $this->config->logger !== null) {
+			$inner = $builder->addDefinition($this->prefix('innerDispatcher'))
+				->setAutowired(false)
+				->setFactory($factory);
+			$eventDispatcherDefinition->setFactory(DiagnosticDispatcher::class, [$inner]);
+		} else {
+			$eventDispatcherDefinition->setFactory($factory);
 		}
-
-		$wrapped = $builder->addDefinition($this->prefix('wrappedOriginal'))
-			->setAutowired(false)
-			->setFactory($eventDispatcherDefinition->getFactory());
-
-		$eventDispatcherDefinition->setFactory(DiagnosticDispatcher::class, [$wrapped]);
 
 		if ($this->config->debug) {
 			$tracyPanel = $builder->addDefinition($this->prefix('tracyPanel'))
+				->setType(IBarPanel::class)
 				->setFactory(Panel::class);
 
-			$eventDispatcherDefinition->addSetup('setPanel', [$tracyPanel]);
+			$eventDispatcherDefinition->addSetup('addLogger', [$tracyPanel]);
 		}
 
 		if ($this->config->logger !== null) {
 			$eventDispatcherDefinition->addSetup(
-				'setLogger',
+				'addLogger',
 				[
-				$this->config->logger,
-				$this->prefix('logger'),
+					$this->config->logger,
+					$this->prefix('logger'),
 				]
 			);
 		}
@@ -163,6 +162,10 @@ class EventDispatcherExtension extends CompilerExtension
 		if ($this->config->debug) {
 			$initialize = $class->getMethod('initialize');
 			$initialize->addBody('$this->getService(?)->addPanel($this->getService(?));', ['tracy.bar', $this->prefix('tracyPanel')]);
+			$initialize->addBody(
+				'$this->getService(?)->setDispatcher($this->getService(?));',
+				[$this->prefix('tracyPanel'), $this->prefix('dispatcher')]
+			);
 		}
 	}
 

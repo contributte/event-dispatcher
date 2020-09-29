@@ -191,7 +191,7 @@ test(function (): void {
 	Assert::type(DiagnosticDispatcher::class, $em);
 	/** @var DiagnosticDispatcher $em */
 	$logger = new TestLogger();
-	$em->setLogger($logger);
+	$em->addLogger($logger);
 
 	// Dispatch subscribed event
 	$event = new Event();
