@@ -87,7 +87,7 @@ class EventDispatcherExtension extends CompilerExtension
 
 		if ($config->autoload === true) {
 			if ($config->lazy === true) {
-				$this->doBeforeCompileLaziness();
+				$this->doBeforeCompileLaziness($config->debug || $config->logger);
 			} else {
 				$this->doBeforeCompile();
 			}
@@ -112,10 +112,10 @@ class EventDispatcherExtension extends CompilerExtension
 	/**
 	 * Collect listeners and subscribers in lazy-way
 	 */
-	private function doBeforeCompileLaziness(): void
+	private function doBeforeCompileLaziness(bool $useInner = false): void
 	{
 		$builder = $this->getContainerBuilder();
-		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
+		$dispatcher = $builder->getDefinition($this->prefix($useInner ? 'innerDispatcher' : 'dispatcher'));
 		assert($dispatcher instanceof ServiceDefinition);
 
 		$subscribers = $builder->findByType(EventSubscriberInterface::class);
