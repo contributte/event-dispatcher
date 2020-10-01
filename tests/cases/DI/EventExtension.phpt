@@ -5,9 +5,12 @@
  */
 
 use Contributte\EventDispatcher\DI\EventDispatcherExtension;
+use Contributte\EventDispatcher\Diagnostics\DiagnosticDispatcher;
+use Contributte\EventDispatcher\Diagnostics\EventInfo;
 use Nette\DI\Compiler;
 use Nette\DI\Container;
 use Nette\DI\ContainerLoader;
+use Psr\Log\Test\TestLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -165,4 +168,59 @@ test(function (): void {
 	/** @var PrioritizedSubscriber $subscriber */
 	$subscriber = $container->getByType(PrioritizedSubscriber::class);
 	Assert::equal([$event], $subscriber->onCall);
+});
+
+// Diagnostic dispatcher
+test(function (): void {
+	$loader = new ContainerLoader(TEMP_DIR, true);
+	$class = $loader->load(function (Compiler $compiler): void {
+		$compiler->addExtension('events', new EventDispatcherExtension());
+		$compiler->loadConfig(FileMock::create('
+		events:
+			debug: true
+		services:
+			foo: Tests\Fixtures\FooSubscriber
+', 'neon'));
+	}, 6);
+
+	/** @var Container $container */
+	$container = new $class();
+
+	/** @var EventDispatcherInterface $em */
+	$em = $container->getByType(EventDispatcherInterface::class);
+	Assert::type(DiagnosticDispatcher::class, $em);
+	/** @var DiagnosticDispatcher $em */
+	$logger = new TestLogger();
+	$em->addLogger($logger);
+
+	// Dispatch subscribed event
+	$event = new Event();
+	$em->dispatch($event, 'foobar');
+
+	/** @var FooSubscriber $subscriber */
+	$subscriber = $container->getByType(FooSubscriber::class);
+	Assert::equal([$event], $subscriber->onCall);
+
+	// dispatch and dispatched events
+	Assert::equal(2, count($logger->records));
+
+	$eventInfo = $logger->records[0]['context']['event'] ?? null;
+	Assert::type(EventInfo::class, $eventInfo);
+	/** @var EventInfo $eventInfo */
+	Assert::equal($event, $eventInfo->event);
+	Assert::true($eventInfo->handled);
+
+	$logger->reset();
+	// Dispatch event without listener
+	$event = new Event();
+	$em->dispatch($event, 'non-existent');
+
+	// dispatch and dispatched events
+	Assert::equal(2, count($logger->records));
+
+	$eventInfo = $logger->records[0]['context']['event'] ?? null;
+	Assert::type(EventInfo::class, $eventInfo);
+	/** @var EventInfo $eventInfo */
+	Assert::equal($event, $eventInfo->event);
+	Assert::false($eventInfo->handled);
 });

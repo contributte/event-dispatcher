@@ -29,7 +29,9 @@
     "phpstan/phpstan-deprecation-rules": "^0.11",
     "phpstan/phpstan-nette": "^0.11",
     "phpstan/phpstan-shim": "^0.11",
-    "phpstan/phpstan-strict-rules": "^0.11"
+    "phpstan/phpstan-strict-rules": "^0.11",
+    "psr/log": "^1.1",
+    "tracy/tracy": "^2.7"
   },
   "conflict": {
     "nette/di": "<3.0.0"

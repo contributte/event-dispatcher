@@ -2,16 +2,20 @@
 
 namespace Contributte\EventDispatcher\DI;
 
+use Contributte\EventDispatcher\Diagnostics\DiagnosticDispatcher;
 use Contributte\EventDispatcher\EventDispatcher;
 use Contributte\EventDispatcher\LazyEventDispatcher;
+use Contributte\EventDispatcher\Tracy\Panel;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\ServiceDefinition;
 use Nette\DI\ServiceCreationException;
+use Nette\PhpGenerator\ClassType;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use stdClass;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Tracy\IBarPanel;
 
 /**
  * @property-read stdClass $config
@@ -24,6 +28,8 @@ class EventDispatcherExtension extends CompilerExtension
 		return Expect::structure([
 			'lazy' => Expect::bool(true),
 			'autoload' => Expect::bool(true),
+			'debug' => Expect::bool(false),
+			'logger' => Expect::string(null),
 		]);
 	}
 
@@ -39,11 +45,36 @@ class EventDispatcherExtension extends CompilerExtension
 			->setType(EventDispatcherInterface::class);
 
 		if ($config->lazy === true) {
-			$eventDispatcherDefinition
-				->setFactory(LazyEventDispatcher::class);
+			$factory = LazyEventDispatcher::class;
 		} else {
-			$eventDispatcherDefinition
-				->setFactory(EventDispatcher::class);
+			$factory = EventDispatcher::class;
+		}
+
+		if ($this->config->debug || $this->config->logger !== null) {
+			$inner = $builder->addDefinition($this->prefix('innerDispatcher'))
+				->setAutowired(false)
+				->setFactory($factory);
+			$eventDispatcherDefinition->setFactory(DiagnosticDispatcher::class, [$inner]);
+		} else {
+			$eventDispatcherDefinition->setFactory($factory);
+		}
+
+		if ($this->config->debug) {
+			$tracyPanel = $builder->addDefinition($this->prefix('tracyPanel'))
+				->setType(IBarPanel::class)
+				->setFactory(Panel::class);
+
+			$eventDispatcherDefinition->addSetup('addLogger', [$tracyPanel]);
+		}
+
+		if ($this->config->logger !== null) {
+			$eventDispatcherDefinition->addSetup(
+				'addLogger',
+				[
+					$this->config->logger,
+					$this->prefix('logger'),
+				]
+			);
 		}
 	}
 
@@ -56,7 +87,7 @@ class EventDispatcherExtension extends CompilerExtension
 
 		if ($config->autoload === true) {
 			if ($config->lazy === true) {
-				$this->doBeforeCompileLaziness();
+				$this->doBeforeCompileLaziness($config->debug || $config->logger);
 			} else {
 				$this->doBeforeCompile();
 			}
@@ -81,10 +112,10 @@ class EventDispatcherExtension extends CompilerExtension
 	/**
 	 * Collect listeners and subscribers in lazy-way
 	 */
-	private function doBeforeCompileLaziness(): void
+	private function doBeforeCompileLaziness(bool $useInner = false): void
 	{
 		$builder = $this->getContainerBuilder();
-		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
+		$dispatcher = $builder->getDefinition($this->prefix($useInner ? 'innerDispatcher' : 'dispatcher'));
 		assert($dispatcher instanceof ServiceDefinition);
 
 		$subscribers = $builder->findByType(EventSubscriberInterface::class);
@@ -120,6 +151,21 @@ class EventDispatcherExtension extends CompilerExtension
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * Initialize Tracy panel
+	 */
+	public function afterCompile(ClassType $class): void
+	{
+		if ($this->config->debug) {
+			$initialize = $class->getMethod('initialize');
+			$initialize->addBody('$this->getService(?)->addPanel($this->getService(?));', ['tracy.bar', $this->prefix('tracyPanel')]);
+			$initialize->addBody(
+				'$this->getService(?)->setDispatcher($this->getService(?));',
+				[$this->prefix('tracyPanel'), $this->prefix('dispatcher')]
+			);
 		}
 	}
 
