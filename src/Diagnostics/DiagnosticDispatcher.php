@@ -35,7 +35,7 @@ class DiagnosticDispatcher implements EventDispatcherInterface
 	/**
 	 * @inheritDoc
 	 */
-	public function addListener(string $eventName, $listener, $priority = 0): void
+	public function addListener($eventName, $listener, $priority = 0): void
 	{
 		$this->original->addListener(...func_get_args());
 	}
@@ -51,7 +51,7 @@ class DiagnosticDispatcher implements EventDispatcherInterface
 	/**
 	 * @inheritDoc
 	 */
-	public function removeListener(string $eventName, $listener): void
+	public function removeListener($eventName, $listener): void
 	{
 		$this->original->removeListener(...func_get_args());
 	}
@@ -64,8 +64,10 @@ class DiagnosticDispatcher implements EventDispatcherInterface
 	/**
 	 * @inheritDoc
 	 */
-	public function dispatch(object $event, ?string $eventName = null): object
+	public function dispatch($event/*, string $eventName = null*/)
 	{
+		$eventName = 1 < \func_num_args() ? func_get_arg(1) : null;
+
 		$info = new EventInfo($event, $eventName);
 		foreach ($this->loggers as $logger) {
 			$logger->debug(sprintf(self::DISPATCHING . ' "%s"', $info->name), ['event' => $info]);
@@ -88,7 +90,7 @@ class DiagnosticDispatcher implements EventDispatcherInterface
 	/**
 	 * @inheritDoc
 	 */
-	public function getListeners(?string $eventName = null)
+	public function getListeners($eventName = null)
 	{
 		return $this->original->getListeners(...func_get_args());
 	}
@@ -96,7 +98,7 @@ class DiagnosticDispatcher implements EventDispatcherInterface
 	/**
 	 * @inheritDoc
 	 */
-	public function getListenerPriority(string $eventName, $listener)
+	public function getListenerPriority($eventName, $listener)
 	{
 		return $this->original->getListenerPriority(...func_get_args());
 	}
@@ -104,7 +106,7 @@ class DiagnosticDispatcher implements EventDispatcherInterface
 	/**
 	 * @inheritDoc
 	 */
-	public function hasListeners(?string $eventName = null)
+	public function hasListeners($eventName = null)
 	{
 		return $this->original->hasListeners(...func_get_args());
 	}
