@@ -131,5 +131,5 @@ Kdyby/Events has a conflict with this package because of it's `SymfonyDispatcher
 ```
 services:
     events.symfonyProxy:
-        autowired: off
+        autowired: false
 ```
