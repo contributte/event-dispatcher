@@ -11,7 +11,7 @@
 
 ## Prologue
 
-`Contributte/EventDispatcher` brings `Symfony/EventDispatcher` to your Nette applications. 
+`Contributte/EventDispatcher` brings `Symfony/EventDispatcher` to your Nette applications.
 
 Please take a look at official documentation: https://symfony.com/doc/current/components/event_dispatcher.html
 
@@ -32,7 +32,7 @@ extensions:
     events: Contributte\EventDispatcher\DI\EventDispatcherExtension
 ```
 
-The extension looks for all services implementing `Symfony\Component\EventDispatcher\EventSubscriberInterface`. 
+The extension looks for all services implementing `Symfony\Component\EventDispatcher\EventSubscriberInterface`.
 And automatically adds them to the event dispatcher. That's all. You don't have to be worried.
 
 ## Configuration
@@ -80,7 +80,7 @@ final class OrderLoggerSubscriber implements EventSubscriberInterface
 }
 ```
 
-```yml
+```yaml
 services:
   - OrderLoggerSubscriber
 ```
@@ -103,7 +103,7 @@ class OrderModel
 		$this->eventDispatcher = $eventDispatcher;
 	}
 
-	public function createOrder(Order $order): void 
+	public function createOrder(Order $order): void
 	{
 		// Create order
 		$this->eventDispatcher->dispatch(new OrderCreatedEvent($order));
@@ -128,7 +128,7 @@ How to make this extension work with other Symfony/EventDispatcher implementatio
 
 Kdyby/Events has a conflict with this package because of it's `SymfonyDispatcher` proxy class. To avoid the conflict simply add this to your config.neon:
 
-```
+```yaml
 services:
     events.symfonyProxy:
         autowired: false
