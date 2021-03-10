@@ -27,9 +27,9 @@ Please take a look at official documentation: https://symfony.com/doc/current/co
 composer require contributte/event-dispatcher
 ```
 
-```yaml
+```neon
 extensions:
-    events: Contributte\EventDispatcher\DI\EventDispatcherExtension
+	events: Contributte\EventDispatcher\DI\EventDispatcherExtension
 ```
 
 The extension looks for all services implementing `Symfony\Component\EventDispatcher\EventSubscriberInterface`.
@@ -41,18 +41,18 @@ And automatically adds them to the event dispatcher. That's all. You don't have 
 
 If you would like to add all subscribers by yourself, you have to disable `autoload`.
 
-```yaml
+```neon
 events:
-    autoload: true/false
+	autoload: true/false
 ```
 
 ### Laziness
 
 Lazy options is enabled (`true`) as default. But you can override it.
 
-```yaml
+```neon
 events:
-    lazy: true/false
+	lazy: true/false
 ```
 
 ## Subscriber
@@ -75,14 +75,14 @@ final class OrderLoggerSubscriber implements EventSubscriberInterface
 
 	public function log(Event $event): void
 	{
-	    // Do some magic here...
+		// Do some magic here...
 	}
 }
 ```
 
-```yaml
+```neon
 services:
-  - OrderLoggerSubscriber
+	- OrderLoggerSubscriber
 ```
 
 ## Dispatcher
@@ -128,8 +128,8 @@ How to make this extension work with other Symfony/EventDispatcher implementatio
 
 Kdyby/Events has a conflict with this package because of it's `SymfonyDispatcher` proxy class. To avoid the conflict simply add this to your config.neon:
 
-```yaml
+```neon
 services:
-    events.symfonyProxy:
-        autowired: false
+	events.symfonyProxy:
+		autowired: false
 ```
