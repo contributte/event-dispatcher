@@ -11,7 +11,7 @@
 
 ## Prologue
 
-`Contributte/EventDispatcher` brings `Symfony/EventDispatcher` to your Nette applications. 
+`Contributte/EventDispatcher` brings `Symfony/EventDispatcher` to your Nette applications.
 
 Please take a look at official documentation: https://symfony.com/doc/current/components/event_dispatcher.html
 
@@ -27,12 +27,12 @@ Please take a look at official documentation: https://symfony.com/doc/current/co
 composer require contributte/event-dispatcher
 ```
 
-```yaml
+```neon
 extensions:
-    events: Contributte\EventDispatcher\DI\EventDispatcherExtension
+	events: Contributte\EventDispatcher\DI\EventDispatcherExtension
 ```
 
-The extension looks for all services implementing `Symfony\Component\EventDispatcher\EventSubscriberInterface`. 
+The extension looks for all services implementing `Symfony\Component\EventDispatcher\EventSubscriberInterface`.
 And automatically adds them to the event dispatcher. That's all. You don't have to be worried.
 
 ## Configuration
@@ -41,18 +41,18 @@ And automatically adds them to the event dispatcher. That's all. You don't have 
 
 If you would like to add all subscribers by yourself, you have to disable `autoload`.
 
-```yaml
+```neon
 events:
-    autoload: true/false
+	autoload: true/false
 ```
 
 ### Laziness
 
 Lazy options is enabled (`true`) as default. But you can override it.
 
-```yaml
+```neon
 events:
-    lazy: true/false
+	lazy: true/false
 ```
 
 ## Subscriber
@@ -75,14 +75,14 @@ final class OrderLoggerSubscriber implements EventSubscriberInterface
 
 	public function log(Event $event): void
 	{
-	    // Do some magic here...
+		// Do some magic here...
 	}
 }
 ```
 
-```yml
+```neon
 services:
-  - OrderLoggerSubscriber
+	- OrderLoggerSubscriber
 ```
 
 ## Dispatcher
@@ -103,7 +103,7 @@ class OrderModel
 		$this->eventDispatcher = $eventDispatcher;
 	}
 
-	public function createOrder(Order $order): void 
+	public function createOrder(Order $order): void
 	{
 		// Create order
 		$this->eventDispatcher->dispatch(new OrderCreatedEvent($order));
@@ -128,8 +128,8 @@ How to make this extension work with other Symfony/EventDispatcher implementatio
 
 Kdyby/Events has a conflict with this package because of it's `SymfonyDispatcher` proxy class. To avoid the conflict simply add this to your config.neon:
 
-```
+```neon
 services:
-    events.symfonyProxy:
-        autowired: false
+	events.symfonyProxy:
+		autowired: false
 ```

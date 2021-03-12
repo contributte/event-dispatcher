@@ -22,7 +22,7 @@ Website ğŸš€ <a href="https://contributte.org">contributte.org</a> | Contact ğŸ‘
 
 To install the latest version of `contributte/event-dispatcher` use [Composer](https://getcomposer.com).
 
-```
+```bash
 composer require contributte/event-dispatcher
 ```
 
