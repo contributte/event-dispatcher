@@ -1,4 +1,4 @@
 parameters:
 	ignoreErrors:
 		# phpstan don't like array callbacks
-		- '#^Parameter \#1 \$function of function call_user_func expects callable\(\)\: mixed, array\(.+\) given\.$#'
+		- '#^Parameter \#1 \$function of function call_user_func expects callable\(\)\: mixed, array\{.+\} given\.$#'
