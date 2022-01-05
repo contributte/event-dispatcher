@@ -13,7 +13,7 @@ on:
 env:
   extensions: "json"
   cache-version: "1"
-  composer-version: "2"
+  composer-version: "v2"
   composer-install: "composer update --no-interaction --no-progress --prefer-dist --prefer-stable"
 
 jobs:
