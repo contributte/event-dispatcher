@@ -1,4 +1,25 @@
+includes:
+	- vendor/phpstan/phpstan-deprecation-rules/rules.neon
+	- vendor/phpstan/phpstan-nette/extension.neon
+	- vendor/phpstan/phpstan-nette/rules.neon
+	- vendor/phpstan/phpstan-strict-rules/rules.neon
+
 parameters:
 	ignoreErrors:
 		# phpstan don't like array callbacks
 		- '#^Parameter \#1 \$function of function call_user_func expects callable\(\)\: mixed, array\{.+\} given\.$#'
+
+		-
+			message: "#^Method Contributte\\\\EventDispatcher\\\\LazyEventDispatcher\\:\\:getListeners\\(\\) should return array\\<Symfony\\\\Component\\\\EventDispatcher\\\\EventSubscriberInterface\\> but returns array\\<array\\<callable\\>\\|\\(callable\\)\\>\\.$#"
+			count: 1
+			path: src/LazyEventDispatcher.php
+
+		-
+			message: "#^Return type \\(array\\<Symfony\\\\Component\\\\EventDispatcher\\\\EventSubscriberInterface\\>\\) of method Contributte\\\\EventDispatcher\\\\LazyEventDispatcher\\:\\:getListeners\\(\\) should be covariant with return type \\(array\\<array\\<callable\\(\\)\\: mixed\\>\\|\\(callable\\(\\)\\: mixed\\)\\>\\) of method Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcher\\:\\:getListeners\\(\\)$#"
+			count: 1
+			path: src/LazyEventDispatcher.php
+
+		-
+			message: "#^Return type \\(array\\<Symfony\\\\Component\\\\EventDispatcher\\\\EventSubscriberInterface\\>\\) of method Contributte\\\\EventDispatcher\\\\LazyEventDispatcher\\:\\:getListeners\\(\\) should be covariant with return type \\(array\\<array\\<callable\\(\\)\\: mixed\\>\\|\\(callable\\(\\)\\: mixed\\)\\>\\) of method Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:getListeners\\(\\)$#"
+			count: 1
+			path: src/LazyEventDispatcher.php

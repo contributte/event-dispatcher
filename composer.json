@@ -24,8 +24,7 @@
   },
   "require-dev": {
     "ninjify/nunjuck": "^0.4.0",
-    "ninjify/qa": "^0.8.0",
-    "phpstan/extension-installer": "^1.0",
+    "ninjify/qa": "^0.12.0",
     "phpstan/phpstan-deprecation-rules": "^1.0",
     "phpstan/phpstan-nette": "^1.0",
     "phpstan/phpstan": "^1.0",
