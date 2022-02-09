@@ -5,6 +5,12 @@ includes:
 	- vendor/phpstan/phpstan-strict-rules/rules.neon
 
 parameters:
+	level: 9
+	phpVersion: 70200
+
+	paths:
+		- src
+
 	ignoreErrors:
 		# phpstan don't like array callbacks
 		- '#^Parameter \#1 \$function of function call_user_func expects callable\(\)\: mixed, array\{.+\} given\.$#'

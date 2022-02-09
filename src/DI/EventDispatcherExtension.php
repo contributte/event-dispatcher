@@ -91,6 +91,7 @@ class EventDispatcherExtension extends CompilerExtension
 		foreach ($subscribers as $name => $subscriber) {
 			assert($subscriber instanceof ServiceDefinition);
 			$events = call_user_func([$subscriber->getEntity(), 'getSubscribedEvents']);
+			assert(is_array($events));
 
 			/**
 			 * ['eventName' => 'methodName']
