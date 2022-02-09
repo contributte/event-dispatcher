@@ -4,15 +4,15 @@
 	<rule ref="./vendor/ninjify/coding-standard/contributte.xml"/>
 
 	<!-- Specific rules -->
-    <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
-        <properties>
-            <property name="rootNamespaces" type="array" value="
-                src=>Contributte\EventDispatcher,
-                tests/fixtures=>Tests\Fixtures
-            "/>
-        </properties>
-    </rule>
+	<rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
+		<properties>
+			<property name="rootNamespaces" type="array">
+				<element key="src" value="Contributte\EventDispatcher"/>
+				<element key="tests" value="Tests"/>
+			</property>
+		</properties>
+	</rule>
 
-    <!-- Exclude folders -->
-    <exclude-pattern>/tests/tmp</exclude-pattern>
+	<!-- Exclude folders -->
+	<exclude-pattern>/tests/tmp</exclude-pattern>
 </ruleset>
