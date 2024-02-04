@@ -9,7 +9,7 @@ final class MultiSubscriber implements EventSubscriberInterface
 {
 
 	/** @var Event[] */
-	public $onCall = [];
+	public array $onCall = [];
 
 	/**
 	 * @return mixed[] The event names to listen to
