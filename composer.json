@@ -20,7 +20,7 @@
   "require": {
     "php": ">=7.2",
     "nette/di": "^3.0.0",
-    "symfony/event-dispatcher": "^4.3.1 || ^5.0.0 || ^6.0.0"
+    "symfony/event-dispatcher": "^6.4.3 || ^7.0.3"
   },
   "require-dev": {
     "contributte/qa": "^0.4",
