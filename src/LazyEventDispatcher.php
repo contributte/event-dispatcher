@@ -9,33 +9,33 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class LazyEventDispatcher extends EventDispatcher
 {
 
-	/** @var Container */
-	private $container;
+	private Container $container;
 
 	/** @var string[][] */
-	private $mapping = [];
+	private array $mapping = [];
 
 	/** @var bool[] */
-	private $instanced = [];
+	private array $instanced = [];
 
 	public function __construct(Container $container)
 	{
 		parent::__construct();
+
 		$this->container = $container;
 	}
 
 	/**
-	 * @param string|null $eventName
-	 * @return EventSubscriberInterface[]
-	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
+	 * @return array<callable[]|callable>
 	 */
-	public function getListeners($eventName = null): array
+	public function getListeners(?string $eventName = null): array
 	{
 		if (isset($this->mapping[$eventName])) {
 			foreach ($this->mapping[$eventName] as $serviceName) {
 				// If service is already instanced, them skip it.
-				// It may producer multiple event registering.
-				if (isset($this->instanced[$serviceName])) continue;
+				// It may produce multiple event registering.
+				if (isset($this->instanced[$serviceName]))
+
+				continue;
 
 				// Obtain service from container
 				$listener = $this->container->getService($serviceName);
@@ -58,17 +58,12 @@ class LazyEventDispatcher extends EventDispatcher
 		return parent::getListeners($eventName);
 	}
 
-
 	public function addSubscriberLazy(string $eventName, string $serviceName): void
 	{
 		$this->mapping[$eventName][] = $serviceName;
 	}
 
-	/**
-	 * @param string|null $eventName
-	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint
-	 */
-	public function hasListeners($eventName = null): bool
+	public function hasListeners(?string $eventName = null): bool
 	{
 		// check if event name is specified and has some lazy subscriber
 		if ($eventName !== null && isset($this->mapping[$eventName])) {

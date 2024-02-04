@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * @property-read stdClass $config
+ * @method stdClass getConfig()
  */
 class EventDispatcherExtension extends CompilerExtension
 {
@@ -27,13 +27,10 @@ class EventDispatcherExtension extends CompilerExtension
 		]);
 	}
 
-	/**
-	 * Register services
-	 */
 	public function loadConfiguration(): void
 	{
 		$builder = $this->getContainerBuilder();
-		$config = $this->config;
+		$config = $this->getConfig();
 
 		$eventDispatcherDefinition = $builder->addDefinition($this->prefix('dispatcher'))
 			->setType(EventDispatcherInterface::class);
@@ -47,12 +44,9 @@ class EventDispatcherExtension extends CompilerExtension
 		}
 	}
 
-	/**
-	 * Decorate services
-	 */
 	public function beforeCompile(): void
 	{
-		$config = $this->config;
+		$config = $this->getConfig();
 
 		if ($config->autoload === true) {
 			if ($config->lazy === true) {
@@ -73,7 +67,7 @@ class EventDispatcherExtension extends CompilerExtension
 		assert($dispatcher instanceof ServiceDefinition);
 
 		$subscribers = $builder->findByType(EventSubscriberInterface::class);
-		foreach ($subscribers as $name => $subscriber) {
+		foreach ($subscribers as $subscriber) {
 			$dispatcher->addSetup('addSubscriber', [$subscriber]);
 		}
 	}
@@ -90,7 +84,7 @@ class EventDispatcherExtension extends CompilerExtension
 		$subscribers = $builder->findByType(EventSubscriberInterface::class);
 		foreach ($subscribers as $name => $subscriber) {
 			assert($subscriber instanceof ServiceDefinition);
-			$events = call_user_func([$subscriber->getEntity(), 'getSubscribedEvents']);
+			$events = call_user_func([$subscriber->getEntity(), 'getSubscribedEvents']); // @phpstan-ignore-line
 			assert(is_array($events));
 
 			/**
