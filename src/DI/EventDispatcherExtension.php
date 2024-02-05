@@ -2,16 +2,23 @@
 
 namespace Contributte\EventDispatcher\DI;
 
-use Contributte\EventDispatcher\EventDispatcher;
-use Contributte\EventDispatcher\LazyEventDispatcher;
+use Contributte\EventDispatcher\Diagnostics\DebugDispatcher;
+use Contributte\EventDispatcher\Diagnostics\TracyDispatcher;
+use Contributte\EventDispatcher\LazyListener;
+use Contributte\EventDispatcher\Tracy\EventPanel;
 use Nette\DI\CompilerExtension;
+use Nette\DI\Container;
 use Nette\DI\Definitions\ServiceDefinition;
+use Nette\DI\Definitions\Statement;
 use Nette\DI\ServiceCreationException;
+use Nette\PhpGenerator\ClassType;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use stdClass;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Tracy\Bar;
 
 /**
  * @method stdClass getConfig()
@@ -24,6 +31,8 @@ class EventDispatcherExtension extends CompilerExtension
 		return Expect::structure([
 			'lazy' => Expect::bool(true),
 			'autoload' => Expect::bool(true),
+			'debug' => Expect::bool(false),
+			'loggers' => Expect::arrayOf(Expect::type(Statement::class)),
 		]);
 	}
 
@@ -32,16 +41,31 @@ class EventDispatcherExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$config = $this->getConfig();
 
-		$eventDispatcherDefinition = $builder->addDefinition($this->prefix('dispatcher'))
-			->setType(EventDispatcherInterface::class);
+		// Original dispatcher
+		$outerDispatcher = $dispatcherDef = $builder->addDefinition($this->prefix('dispatcher'))
+			->setType(EventDispatcherInterface::class)
+			->setFactory(EventDispatcher::class)
+			->setAutowired(false);
 
-		if ($config->lazy === true) {
-			$eventDispatcherDefinition
-				->setFactory(LazyEventDispatcher::class);
-		} else {
-			$eventDispatcherDefinition
-				->setFactory(EventDispatcher::class);
+		// Dispatcher for logging
+		if ($config->loggers !== []) {
+			$loggingDispatcherDef = $builder->addDefinition($this->prefix('dispatcher.logging'))
+				->setFactory(DebugDispatcher::class, [$outerDispatcher])
+				->setAutowired(false);
+			$outerDispatcher = $loggingDispatcherDef;
 		}
+
+		// Dispatcher for Tracy bar
+		if ($config->debug === true) {
+			$tracyDispatcherDef = $builder->addDefinition($this->prefix('dispatcher.tracy'))
+				->setType(EventDispatcherInterface::class)
+				->setFactory(TracyDispatcher::class, [$outerDispatcher])
+				->setAutowired(false);
+			$outerDispatcher = $tracyDispatcherDef;
+		}
+
+		// Only outer dispatcher should be autowired
+		$outerDispatcher->setAutowired();
 	}
 
 	public function beforeCompile(): void
@@ -54,6 +78,23 @@ class EventDispatcherExtension extends CompilerExtension
 			} else {
 				$this->doBeforeCompile();
 			}
+		}
+	}
+
+	public function afterCompile(ClassType $class): void
+	{
+		$config = $this->getConfig();
+		$builder = $this->getContainerBuilder();
+		$initialization = $this->getInitialization();
+
+		if ($config->debug) {
+			$initialization->addBody(
+				// @phpstan-ignore-next-line
+				$builder->formatPhp('?->addPanel(?);', [
+					$builder->getDefinitionByType(Bar::class),
+					new Statement(EventPanel::class, [$builder->getDefinition($this->prefix('dispatcher.tracy'))]),
+				])
+			);
 		}
 	}
 
@@ -82,36 +123,43 @@ class EventDispatcherExtension extends CompilerExtension
 		assert($dispatcher instanceof ServiceDefinition);
 
 		$subscribers = $builder->findByType(EventSubscriberInterface::class);
-		foreach ($subscribers as $name => $subscriber) {
+		foreach ($subscribers as $serviceName => $subscriber) {
 			assert($subscriber instanceof ServiceDefinition);
 			$events = call_user_func([$subscriber->getEntity(), 'getSubscribedEvents']); // @phpstan-ignore-line
 			assert(is_array($events));
 
-			/**
-			 * ['eventName' => 'methodName']
-			 * ['eventName' => ['methodName', $priority]]
-			 * ['eventName' => [['methodName1', $priority], ['methodName2']]]
-			 */
-			foreach ($events as $event => $args) {
-				if (is_string($args)) {
-					if (!method_exists((string) $subscriber->getType(), $args)) {
-						throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', $subscriber->getType(), $args));
+			foreach ($events as $event => $params) {
+				if (is_string($params)) { // ['eventName' => 'methodName']
+					if (!method_exists((string) $subscriber->getType(), $params)) {
+						throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', $subscriber->getType(), $params));
 					}
 
-					$dispatcher->addSetup('addSubscriberLazy', [$event, $name]);
-				} elseif (is_string($args[0])) {
-					if (!method_exists((string) $subscriber->getType(), $args[0])) {
-						throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', $subscriber->getType(), $args[0]));
+					$dispatcher->addSetup('addListener', [
+							'eventName' => $event,
+							'listener' => new Statement(LazyListener::class, [$serviceName, $params, $builder->getDefinitionByType(Container::class)]),
+							'priority' => 0,
+						]);
+				} elseif (is_string($params[0])) { // ['eventName' => ['methodName', $priority]]
+					if (!method_exists((string) $subscriber->getType(), $params[0])) {
+						throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', $subscriber->getType(), $params[0]));
 					}
 
-					$dispatcher->addSetup('addSubscriberLazy', [$event, $name]);
-				} else {
-					foreach ($args as $arg) {
-						if (!method_exists((string) $subscriber->getType(), $arg[0])) {
-							throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', $subscriber->getType(), $arg[0]));
+					$dispatcher->addSetup('addListener', [
+							'eventName' => $event,
+							'listener' => new Statement(LazyListener::class, [$serviceName, $params[0], $builder->getDefinitionByType(Container::class)]),
+							'priority' => $params[1] ?? 0,
+						]);
+				} elseif (is_array($params[0])) { // ['eventName' => [['methodName1', $priority], ['methodName2']]]
+					foreach ($params as $listener) {
+						if (!method_exists((string) $subscriber->getType(), $listener[0])) {
+							throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', $subscriber->getType(), $listener[0]));
 						}
 
-						$dispatcher->addSetup('addSubscriberLazy', [$event, $name]);
+						$dispatcher->addSetup('addListener', [
+								'eventName' => $event,
+								'listener' => new Statement(LazyListener::class, [$serviceName, $listener[0], $builder->getDefinitionByType(Container::class)]),
+								'priority' => $listener[1] ?? 0,
+							]);
 					}
 				}
 			}

@@ -37,22 +37,51 @@ And automatically adds them to the event dispatcher. That's all. You don't have 
 
 ## Configuration
 
+**Default**
+
+```neon
+events:
+		lazy: true
+		autoload: true
+		debug: false
+		loggers: []
+```
+
 ### Autoload
 
-If you would like to add all subscribers by yourself, you have to disable `autoload`.
+Autoload option is enabled (`true`) as default. If you would like to add all subscribers by yourself, you have to disable `autoload`.
 
 ```neon
 events:
 	autoload: true/false
 ```
 
-### Laziness
+### Lazy-loading
 
-Lazy options is enabled (`true`) as default. But you can override it.
+Lazy option is enabled (`true`) as default. But you can override it.
 
 ```neon
 events:
 	lazy: true/false
+```
+
+### Debug
+
+Debug option is disabled (`false`) as default. If you want to show Tracy panel, you have to enable it.
+
+```neon
+events:
+	debug: %debugMode%
+```
+
+### Logging
+
+You can log all events via loggers. Just add logger to the configuration.
+
+```neon
+events:
+	loggers:
+		- App\Logger\FileLogger(%tempDir%/events.log)
 ```
 
 ## Subscriber
@@ -92,20 +121,17 @@ Get dispatcher from DI and dispatch your events
 ```php
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class OrderModel
+class UserFacade
 {
 
-	/** @var EventDispatcherInterface */
-	private $eventDispatcher;
-
-	public function __construct(EventDispatcherInterface $eventDispatcher)
+	public function __construct(
+	  private EventDispatcherInterface $eventDispatcher
+  )
 	{
-		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	public function createOrder(Order $order): void
 	{
-		// Create order
 		$this->eventDispatcher->dispatch(new OrderCreatedEvent($order));
 	}
 
@@ -114,22 +140,8 @@ class OrderModel
 
 ## Extra
 
-The goal of this library is to be the most tiniest and purest adaptation of [Symfony Event-Dispatcher](https://github.com/symfony/event-dispatcher) to [Nette Framework](https://github.com/nette/).
+The goal of this library is to be the simplest and purest adaptation of [Symfony Event-Dispatcher](https://github.com/symfony/event-dispatcher) to [Nette Framework](https://github.com/nette/).
 
 As you can see only one `Extension` class is provided. Nette has many single packages and here comes the [`event-dispatcher-extra`](https://github.com/contributte/event-dispatcher-extra) package.
 
 This extra repository contains useful events for **application**, **latte** and many others. [Take a look](https://github.com/contributte/event-dispatcher-extra).
-
-## Compatibility
-
-How to make this extension work with other Symfony/EventDispatcher implementations.
-
-### Kdyby/Events
-
-Kdyby/Events has a conflict with this package because of it's `SymfonyDispatcher` proxy class. To avoid the conflict simply add this to your config.neon:
-
-```neon
-services:
-	events.symfonyProxy:
-		autowired: false
-```
