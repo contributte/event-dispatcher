@@ -17,6 +17,11 @@ class LazyListener
 	{
 	}
 
+	public function toString(): string
+	{
+		return get_class($this->service ?? $this) . '::' . $this->methodName;
+	}
+
 	public function __invoke(): mixed
 	{
 		if ($this->service === null) {

@@ -68,10 +68,14 @@ use Tracy\Dumper;
 								</td>
 							<?php endif; ?>
 							<td class="listener-name">
-								<?=
-								(\is_object($handler[0]) && \is_string($handler[1]))
-									? \get_class($handler[0]) . '::' . $handler[1]
-									: Dumper::toHtml($handler);
+								<?php
+								if (\is_array($handler) && \is_object($handler[0]) && \is_string($handler[1])) {
+									echo \get_class($handler[0]) . '::' . $handler[1];
+								} else if ($handler instanceof \Contributte\EventDispatcher\LazyListener) {
+									echo $handler->toString();
+								} else {
+									echo Dumper::toHtml($handler);
+								}
 								?>
 							</td>
 						</tr>
