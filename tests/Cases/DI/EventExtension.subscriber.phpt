@@ -16,7 +16,7 @@ use Tests\Fixtures\PrioritizedSubscriber;
 
 require_once __DIR__ . '/../../bootstrap.php';
 
-// Dispatch event with NO defined subscriber for event
+// No defined subscriber for event
 Toolkit::test(function (): void {
 	$container = ContainerBuilder::of()
 		->withCompiler(function (Compiler $compiler): void {
@@ -172,7 +172,7 @@ Toolkit::test(function (): void {
 	Assert::equal([$event], $subscriber->onCall);
 });
 
-// Dispatch event with NO subscribers at all
+// No subscribers at all
 Toolkit::test(function (): void {
 	$container = ContainerBuilder::of()
 		->withCompiler(function (Compiler $compiler): void {
