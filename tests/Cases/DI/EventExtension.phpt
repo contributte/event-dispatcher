@@ -3,6 +3,7 @@
 use Contributte\EventDispatcher\DI\EventDispatcherExtension;
 use Contributte\Tester\Toolkit;
 use Contributte\Tester\Utils\ContainerBuilder;
+use Contributte\Tester\Utils\Neonkit;
 use Nette\DI\Compiler;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -20,10 +21,11 @@ Toolkit::test(function (): void {
 	$container = ContainerBuilder::of()
 		->withCompiler(function (Compiler $compiler): void {
 			$compiler->addExtension('events', new EventDispatcherExtension());
-			$compiler->loadConfig(FileMock::create('
-			services:
-				foo: Tests\Fixtures\FooSubscriber
-		', 'neon'));
+			$compiler->addConfig(Neonkit::load(<<<'NEON'
+				services:
+					foo: Tests\Fixtures\FooSubscriber
+			NEON
+			));
 		})->build();
 
 	/** @var EventDispatcherInterface $em */
@@ -54,10 +56,11 @@ Toolkit::test(function (): void {
 	$container = ContainerBuilder::of()
 		->withCompiler(function (Compiler $compiler): void {
 			$compiler->addExtension('events', new EventDispatcherExtension());
-			$compiler->loadConfig(FileMock::create('
-		services:
-			foo: Tests\Fixtures\FooSubscriber
-', 'neon'));
+			$compiler->addConfig(Neonkit::load(<<<'NEON'
+				services:
+					foo: Tests\Fixtures\FooSubscriber
+			NEON
+			));
 		})->build();
 
 	/** @var EventDispatcherInterface $em */
@@ -95,11 +98,12 @@ Toolkit::test(function (): void {
 	$container = ContainerBuilder::of()
 		->withCompiler(function (Compiler $compiler): void {
 			$compiler->addExtension('events', new EventDispatcherExtension());
-			$compiler->loadConfig(FileMock::create('
-		services:
-			foo: Tests\Fixtures\FooSubscriber
-			bar: Tests\Fixtures\BarSubscriber
-', 'neon'));
+			$compiler->addConfig(Neonkit::load(<<<'NEON'
+				services:
+					foo: Tests\Fixtures\FooSubscriber
+					bar: Tests\Fixtures\BarSubscriber
+			NEON
+			));
 		})->build();
 
 	Assert::count(2, $container->findByType(EventSubscriberInterface::class));
@@ -110,10 +114,11 @@ Toolkit::test(function (): void {
 	$container = ContainerBuilder::of()
 		->withCompiler(function (Compiler $compiler): void {
 			$compiler->addExtension('events', new EventDispatcherExtension());
-			$compiler->loadConfig(FileMock::create('
-		services:
-			multi: Tests\Fixtures\MultiSubscriber
-', 'neon'));
+			$compiler->addConfig(Neonkit::load(<<<'NEON'
+				services:
+					multi: Tests\Fixtures\MultiSubscriber
+			NEON
+			));
 		})->build();
 
 	/** @var EventDispatcherInterface $em */
@@ -142,10 +147,11 @@ Toolkit::test(function (): void {
 	$container = ContainerBuilder::of()
 		->withCompiler(function (Compiler $compiler): void {
 			$compiler->addExtension('events', new EventDispatcherExtension());
-			$compiler->loadConfig(FileMock::create('
-		services:
-			prioritized: Tests\Fixtures\PrioritizedSubscriber
-', 'neon'));
+			$compiler->addConfig(Neonkit::load(<<<'NEON'
+				services:
+					prioritized: Tests\Fixtures\PrioritizedSubscriber
+			NEON
+			));
 		})->build();
 
 	/** @var EventDispatcherInterface $em */
