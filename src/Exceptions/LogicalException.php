@@ -4,7 +4,7 @@ namespace Contributte\EventDispatcher\Exceptions;
 
 use LogicException;
 
-abstract class LogicalException extends LogicException
+final class LogicalException extends LogicException
 {
 
 }
