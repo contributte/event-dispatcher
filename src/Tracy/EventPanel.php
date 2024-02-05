@@ -23,7 +23,7 @@ class EventPanel implements IBarPanel
 		$totalCount = count($this->dispatcher->getEvents()); // @phpcs:ignore
 		$handledCount = $this->handledCount(); // @phpcs:ignore
 		$totalTime = $this->countTotalTime(); // @phpcs:ignore
-		$totalTime = ($totalTime > 0 ? ' / ' . number_format($totalTime * 1000, 1, '.', ' ') . ' ms' : ''); // @phpcs:ignore
+		$totalTime = number_format($totalTime * 1000, 1, '.', ' ') . ' ms'; // @phpcs:ignore
 
 		ob_start();
 		require __DIR__ . '/templates/tab.phtml';

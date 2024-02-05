@@ -1,5 +1,4 @@
 <?php
-
 /** @var EventInfo[] $events */
 /** @var array<string,callable> $listeners */
 /** @var int $handledCount */
@@ -8,7 +7,6 @@
 
 use Contributte\EventDispatcher\Diagnostics\EventInfo;
 use Tracy\Dumper;
-
 ?>
 <style>
 	#tracy-debug .event-name, #tracy-debug .listener-name {
@@ -54,8 +52,8 @@ use Tracy\Dumper;
 		<?php endif; ?>
 
 		<div style="margin-top: 2px;">
-			Listeners
-			<table>
+			<h2>Listeners</h2>
+			<table style="margin-top: 0">
 				<tr>
 					<th>Event</th>
 					<th>Listeners</th>
@@ -65,7 +63,8 @@ use Tracy\Dumper;
 					<?php foreach ($listen as $i => $handler): ?>
 						<tr>
 							<?php if ($i === 0): ?>
-								<td rowspan="<?= count($listen) ?>"><code class="event-name"><?= $eventName ?></code>
+								<td rowspan="<?= count($listen) ?>">
+									<code class="event-name"><?= $eventName ?></code>
 								</td>
 							<?php endif; ?>
 							<td class="listener-name">
@@ -80,7 +79,9 @@ use Tracy\Dumper;
 				<?php endforeach; ?>
 			</table>
 
-			<?= Dumper::toHtml($listeners, [Dumper::COLLAPSE => true]); ?>
+			<div style="margin-top: var(--tracy-space);">
+				<?= Dumper::toHtml($listeners, [Dumper::COLLAPSE => true]); ?>
+			</div>
 		</div>
 	</div>
 </div>
