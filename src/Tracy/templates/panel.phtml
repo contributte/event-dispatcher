@@ -1,11 +1,12 @@
 <?php
-/** @var EventInfo[] $events */
+/** @var int $debugContentDepth */
+/** @var EventTrace[] $events */
 /** @var array<string,callable> $listeners */
 /** @var int $handledCount */
 
 /** @var float $totalTime */
 
-use Contributte\EventDispatcher\Diagnostics\EventInfo;
+use Contributte\EventDispatcher\Diagnostics\EventTrace;
 use Tracy\Dumper;
 ?>
 <style>
@@ -44,7 +45,7 @@ use Tracy\Dumper;
 						</td>
 						<td><?= $e->handled ? 'yes' : 'no' ?></td>
 						<td>
-							<?= Dumper::toHtml($e->event, [Dumper::COLLAPSE => true]); ?>
+							<?= Dumper::toHtml($e->event, [Dumper::COLLAPSE => true, Dumper::DEPTH => $debugContentDepth]); ?>
 						</td>
 					</tr>
 				<?php endforeach; ?>
@@ -74,7 +75,7 @@ use Tracy\Dumper;
 								} else if ($handler instanceof \Contributte\EventDispatcher\LazyListener) {
 									echo $handler->toString();
 								} else {
-									echo Dumper::toHtml($handler);
+									echo Dumper::toHtml($handler, [Dumper::DEPTH => $debugContentDepth]);
 								}
 								?>
 							</td>
@@ -84,7 +85,7 @@ use Tracy\Dumper;
 			</table>
 
 			<div style="margin-top: var(--tracy-space);">
-				<?= Dumper::toHtml($listeners, [Dumper::COLLAPSE => true]); ?>
+				<?= Dumper::toHtml($listeners, [Dumper::COLLAPSE => true, Dumper::DEPTH => $debugContentDepth + 2]); ?>
 			</div>
 		</div>
 	</div>

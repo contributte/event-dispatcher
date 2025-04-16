@@ -32,6 +32,7 @@ class EventDispatcherExtension extends CompilerExtension
 			'lazy' => Expect::bool(true),
 			'autoload' => Expect::bool(true),
 			'debug' => Expect::bool(false),
+			'debugContentDepth' => Expect::int(2),
 			'loggers' => Expect::arrayOf(Expect::type(Statement::class)),
 		]);
 	}
@@ -92,7 +93,13 @@ class EventDispatcherExtension extends CompilerExtension
 				// @phpstan-ignore-next-line
 				$builder->formatPhp('?->addPanel(?);', [
 					$builder->getDefinitionByType(Bar::class),
-					new Statement(EventPanel::class, [$builder->getDefinition($this->prefix('dispatcher.tracy'))]),
+					new Statement(
+						EventPanel::class,
+						[
+							$builder->getDefinition($this->prefix('dispatcher.tracy')),
+							$config->debugContentDepth,
+						]
+					),
 				])
 			);
 		}
