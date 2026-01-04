@@ -139,26 +139,33 @@ class EventDispatcherExtension extends CompilerExtension
 							'listener' => new Statement(LazyListener::class, [$serviceName, $params, $builder->getDefinitionByType(Container::class)]),
 							'priority' => 0,
 						]);
-				} elseif (is_string($params[0])) { // ['eventName' => ['methodName', $priority]]
-					if (!method_exists((string) $subscriber->getType(), $params[0])) {
-						throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', $subscriber->getType(), $params[0]));
+				} elseif (is_array($params) && isset($params[0]) && is_string($params[0])) { // ['eventName' => ['methodName', $priority]]
+					$method = $params[0];
+					$priority = isset($params[1]) && is_int($params[1]) ? $params[1] : 0;
+
+					if (!method_exists((string) $subscriber->getType(), $method)) {
+						throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', $subscriber->getType(), $method));
 					}
 
 					$dispatcher->addSetup('addListener', [
 							'eventName' => $event,
-							'listener' => new Statement(LazyListener::class, [$serviceName, $params[0], $builder->getDefinitionByType(Container::class)]),
-							'priority' => $params[1] ?? 0,
+							'listener' => new Statement(LazyListener::class, [$serviceName, $method, $builder->getDefinitionByType(Container::class)]),
+							'priority' => $priority,
 						]);
-				} elseif (is_array($params[0])) { // ['eventName' => [['methodName1', $priority], ['methodName2']]]
+				} elseif (is_array($params) && isset($params[0]) && is_array($params[0])) { // ['eventName' => [['methodName1', $priority], ['methodName2']]]
 					foreach ($params as $listener) {
-						if (!method_exists((string) $subscriber->getType(), $listener[0])) {
-							throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', $subscriber->getType(), $listener[0]));
+						assert(is_array($listener) && isset($listener[0]) && is_string($listener[0]));
+						$method = $listener[0];
+						$priority = isset($listener[1]) && is_int($listener[1]) ? $listener[1] : 0;
+
+						if (!method_exists((string) $subscriber->getType(), $method)) {
+							throw new ServiceCreationException(sprintf('Event listener %s does not have callable method %s', $subscriber->getType(), $method));
 						}
 
 						$dispatcher->addSetup('addListener', [
 								'eventName' => $event,
-								'listener' => new Statement(LazyListener::class, [$serviceName, $listener[0], $builder->getDefinitionByType(Container::class)]),
-								'priority' => $listener[1] ?? 0,
+								'listener' => new Statement(LazyListener::class, [$serviceName, $method, $builder->getDefinitionByType(Container::class)]),
+								'priority' => $priority,
 							]);
 					}
 				}
