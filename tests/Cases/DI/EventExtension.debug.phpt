@@ -20,7 +20,31 @@ Toolkit::test(function (): void {
 			$compiler->addExtension('events', new EventDispatcherExtension());
 			$compiler->addConfig(Neonkit::load(<<<'NEON'
 				events:
-					debug: true
+					debug:
+						panel: true
+			NEON
+			));
+		})->build();
+
+	$container->initialize();
+
+	/** @var Bar $bar */
+	$bar = $container->getByType(Bar::class);
+
+	Assert::notNull($bar->getPanel(EventPanel::class));
+});
+
+// Add Tracy panel with depth limit
+Toolkit::test(function (): void {
+	$container = ContainerBuilder::of()
+		->withCompiler(function (Compiler $compiler): void {
+			$compiler->addExtension('tracy', new TracyExtension());
+			$compiler->addExtension('events', new EventDispatcherExtension());
+			$compiler->addConfig(Neonkit::load(<<<'NEON'
+				events:
+					debug:
+						panel: true
+						deep: 3
 			NEON
 			));
 		})->build();
