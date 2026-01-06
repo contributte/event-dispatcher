@@ -41,10 +41,12 @@ And automatically adds them to the event dispatcher. That's all. You don't have 
 
 ```neon
 events:
-		lazy: true
-		autoload: true
-		debug: false
-		loggers: []
+	lazy: true
+	autoload: true
+	debug:
+		panel: false
+		deep: null
+	loggers: []
 ```
 
 ### Autoload
@@ -67,12 +69,17 @@ events:
 
 ### Debug
 
-Debug option is disabled (`false`) as default. If you want to show Tracy panel, you have to enable it.
+Debug option allows you to enable Tracy panel and configure its behavior.
 
 ```neon
 events:
-	debug: %debugMode%
+	debug:
+		panel: %debugMode%
+		deep: 4
 ```
+
+- `panel` - Enable/disable Tracy debug panel (default: `false`)
+- `deep` - Maximum depth of dumped event contents in Tracy panel (default: `null` = Tracy default)
 
 ### Logging
 
