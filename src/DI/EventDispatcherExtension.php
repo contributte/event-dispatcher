@@ -31,7 +31,10 @@ class EventDispatcherExtension extends CompilerExtension
 		return Expect::structure([
 			'lazy' => Expect::bool(true),
 			'autoload' => Expect::bool(true),
-			'debug' => Expect::bool(false),
+			'debug' => Expect::structure([
+				'panel' => Expect::bool(false),
+				'deep' => Expect::int()->nullable(),
+			]),
 			'loggers' => Expect::arrayOf(Expect::type(Statement::class)),
 		]);
 	}
@@ -56,7 +59,7 @@ class EventDispatcherExtension extends CompilerExtension
 		}
 
 		// Dispatcher for Tracy bar
-		if ($config->debug === true) {
+		if ($config->debug->panel) {
 			$tracyDispatcherDef = $builder->addDefinition($this->prefix('dispatcher.tracy'))
 				->setType(EventDispatcherInterface::class)
 				->setFactory(TracyDispatcher::class, [$outerDispatcher])
@@ -87,12 +90,15 @@ class EventDispatcherExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$initialization = $this->getInitialization();
 
-		if ($config->debug) {
+		if ($config->debug->panel) {
 			$initialization->addBody(
 				// @phpstan-ignore-next-line
 				$builder->formatPhp('?->addPanel(?);', [
 					$builder->getDefinitionByType(Bar::class),
-					new Statement(EventPanel::class, [$builder->getDefinition($this->prefix('dispatcher.tracy'))]),
+					new Statement(EventPanel::class, [
+						$builder->getDefinition($this->prefix('dispatcher.tracy')),
+						$config->debug->deep,
+					]),
 				])
 			);
 		}

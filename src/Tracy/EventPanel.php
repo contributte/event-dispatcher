@@ -10,9 +10,12 @@ class EventPanel implements IBarPanel
 
 	private TracyDispatcher $dispatcher;
 
-	public function __construct(TracyDispatcher $dispatcher)
+	private ?int $deep;
+
+	public function __construct(TracyDispatcher $dispatcher, ?int $deep = null)
 	{
 		$this->dispatcher = $dispatcher;
+		$this->deep = $deep;
 	}
 
 	/**
@@ -40,6 +43,7 @@ class EventPanel implements IBarPanel
 		$totalTime = $this->countTotalTime(); // @phpcs:ignore
 		$events = $this->dispatcher->getEvents(); // @phpcs:ignore
 		$listeners = $this->dispatcher->getListeners();
+		$deep = $this->deep; // @phpcs:ignore
 		ksort($listeners);
 		ob_start();
 		require __DIR__ . '/templates/panel.phtml';
