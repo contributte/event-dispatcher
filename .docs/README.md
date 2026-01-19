@@ -7,6 +7,9 @@ Integration of [Symfony EventDispatcher](https://symfony.com/doc/current/compone
 - [Getting started](#getting-started)
   - [Setup](#setup)
   - [Configuration](#configuration)
+    - [Minimal configuration](#minimal-configuration)
+    - [Full configuration](#full-configuration)
+    - [Configuration options](#configuration-options)
 - [Subscribers](#subscribers)
   - [Creating a subscriber](#creating-a-subscriber)
   - [Event listener formats](#event-listener-formats)
@@ -48,15 +51,35 @@ The extension automatically discovers all services implementing `Symfony\Compone
 
 ## Configuration
 
+### Minimal configuration
+
 ```neon
+extensions:
+    events: Contributte\EventDispatcher\DI\EventDispatcherExtension
+```
+
+### Full configuration
+
+```neon
+extensions:
+    events: Contributte\EventDispatcher\DI\EventDispatcherExtension
+
 events:
     lazy: true
     autoload: true
     debug:
-        panel: false
-        deep: null
-    loggers: []
+        panel: %debugMode%
+        deep: 4
+    loggers:
+        - @App\Logging\EventLogger
+
+services:
+    - App\Logging\EventLogger
+    - App\Subscribers\OrderSubscriber
+    - App\Subscribers\UserSubscriber
 ```
+
+### Configuration options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
