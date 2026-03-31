@@ -81,6 +81,12 @@ events:
 - `panel` - Enable/disable Tracy debug panel (default: `false`)
 - `deep` - Maximum depth of dumped event contents in Tracy panel (default: `null` = Tracy default)
 
+When enabled, the Tracy panel shows:
+
+- dispatched events with total duration and payload dump
+- called vs skipped listeners, including their priorities
+- propagation stop and listener failures when they happen
+
 ### Logging
 
 You can log all events via loggers. Just add logger to the configuration.
@@ -90,6 +96,9 @@ events:
 	loggers:
 		- App\Logger\FileLogger(%tempDir%/events.log)
 ```
+
+Configured loggers receive debug messages for `event started`, `event dispatched`, and `event failed`.
+The logger context contains the `event` trace object with timing, listener, and failure details.
 
 ## Subscriber
 

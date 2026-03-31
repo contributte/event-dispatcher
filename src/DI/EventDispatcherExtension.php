@@ -46,17 +46,9 @@ class EventDispatcherExtension extends CompilerExtension
 
 		// Original dispatcher
 		$outerDispatcher = $dispatcherDef = $builder->addDefinition($this->prefix('dispatcher'))
-			->setType(EventDispatcherInterface::class)
+			->setType(EventDispatcher::class)
 			->setFactory(EventDispatcher::class)
 			->setAutowired(false);
-
-		// Dispatcher for logging
-		if ($config->loggers !== []) {
-			$loggingDispatcherDef = $builder->addDefinition($this->prefix('dispatcher.logging'))
-				->setFactory(DebugDispatcher::class, [$outerDispatcher])
-				->setAutowired(false);
-			$outerDispatcher = $loggingDispatcherDef;
-		}
 
 		// Dispatcher for Tracy bar
 		if ($config->debug->panel) {
@@ -64,7 +56,15 @@ class EventDispatcherExtension extends CompilerExtension
 				->setType(EventDispatcherInterface::class)
 				->setFactory(TracyDispatcher::class, [$outerDispatcher])
 				->setAutowired(false);
+			$this->wireLoggers($tracyDispatcherDef, $config->loggers);
 			$outerDispatcher = $tracyDispatcherDef;
+		} elseif ($config->loggers !== []) {
+			$loggingDispatcherDef = $builder->addDefinition($this->prefix('dispatcher.logging'))
+				->setType(EventDispatcherInterface::class)
+				->setFactory(DebugDispatcher::class, [$outerDispatcher])
+				->setAutowired(false);
+			$this->wireLoggers($loggingDispatcherDef, $config->loggers);
+			$outerDispatcher = $loggingDispatcherDef;
 		}
 
 		// Only outer dispatcher should be autowired
@@ -96,7 +96,7 @@ class EventDispatcherExtension extends CompilerExtension
 				$builder->formatPhp('?->addPanel(?);', [
 					$builder->getDefinitionByType(Bar::class),
 					new Statement(EventPanel::class, [
-						$builder->getDefinition($this->prefix('dispatcher.tracy')),
+						'@' . $this->prefix('dispatcher.tracy'),
 						$config->debug->deep,
 					]),
 				])
@@ -142,7 +142,7 @@ class EventDispatcherExtension extends CompilerExtension
 
 					$dispatcher->addSetup('addListener', [
 							'eventName' => $event,
-							'listener' => new Statement(LazyListener::class, [$serviceName, $params, $builder->getDefinitionByType(Container::class)]),
+							'listener' => new Statement(LazyListener::class, [$serviceName, $params, $builder->getDefinitionByType(Container::class), $subscriber->getType()]),
 							'priority' => 0,
 						]);
 				} elseif (is_array($params) && isset($params[0]) && is_string($params[0])) { // ['eventName' => ['methodName', $priority]]
@@ -155,7 +155,7 @@ class EventDispatcherExtension extends CompilerExtension
 
 					$dispatcher->addSetup('addListener', [
 							'eventName' => $event,
-							'listener' => new Statement(LazyListener::class, [$serviceName, $method, $builder->getDefinitionByType(Container::class)]),
+							'listener' => new Statement(LazyListener::class, [$serviceName, $method, $builder->getDefinitionByType(Container::class), $subscriber->getType()]),
 							'priority' => $priority,
 						]);
 				} elseif (is_array($params) && isset($params[0]) && is_array($params[0])) { // ['eventName' => [['methodName1', $priority], ['methodName2']]]
@@ -170,12 +170,22 @@ class EventDispatcherExtension extends CompilerExtension
 
 						$dispatcher->addSetup('addListener', [
 								'eventName' => $event,
-								'listener' => new Statement(LazyListener::class, [$serviceName, $method, $builder->getDefinitionByType(Container::class)]),
+								'listener' => new Statement(LazyListener::class, [$serviceName, $method, $builder->getDefinitionByType(Container::class), $subscriber->getType()]),
 								'priority' => $priority,
 							]);
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * @param Statement[] $loggers
+	 */
+	private function wireLoggers(ServiceDefinition $dispatcher, array $loggers): void
+	{
+		foreach ($loggers as $logger) {
+			$dispatcher->addSetup('addLogger', [$logger]);
 		}
 	}
 

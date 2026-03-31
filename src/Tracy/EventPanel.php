@@ -2,6 +2,7 @@
 
 namespace Contributte\EventDispatcher\Tracy;
 
+use Contributte\EventDispatcher\Diagnostics\ListenerDescriber;
 use Contributte\EventDispatcher\Diagnostics\TracyDispatcher;
 use Tracy\IBarPanel;
 
@@ -25,6 +26,7 @@ class EventPanel implements IBarPanel
 	{
 		$totalCount = count($this->dispatcher->getEvents()); // @phpcs:ignore
 		$handledCount = $this->handledCount(); // @phpcs:ignore
+		$failedCount = $this->failedCount(); // @phpcs:ignore
 		$totalTime = $this->countTotalTime(); // @phpcs:ignore
 		$totalTime = number_format($totalTime * 1000, 1, '.', ' ') . ' ms'; // @phpcs:ignore
 
@@ -40,11 +42,11 @@ class EventPanel implements IBarPanel
 	public function getPanel(): string
 	{
 		$handledCount = $this->handledCount(); // @phpcs:ignore
+		$failedCount = $this->failedCount(); // @phpcs:ignore
 		$totalTime = $this->countTotalTime(); // @phpcs:ignore
 		$events = $this->dispatcher->getEvents(); // @phpcs:ignore
-		$listeners = $this->dispatcher->getListeners();
+		$registeredListeners = $this->collectRegisteredListeners(); // @phpcs:ignore
 		$deep = $this->deep; // @phpcs:ignore
-		ksort($listeners);
 		ob_start();
 		require __DIR__ . '/templates/panel.phtml';
 
@@ -69,6 +71,45 @@ class EventPanel implements IBarPanel
 		}
 
 		return $handled;
+	}
+
+	private function failedCount(): int
+	{
+		$failed = 0;
+		foreach ($this->dispatcher->getEvents() as $event) {
+			$failed += $event->exception !== null ? 1 : 0;
+		}
+
+		return $failed;
+	}
+
+	/**
+	 * @return array<string, array<int, array{label: string, priority: int}>>
+	 */
+	private function collectRegisteredListeners(): array
+	{
+		$listeners = $this->dispatcher->getListeners();
+		ksort($listeners);
+
+		$registeredListeners = [];
+		foreach ($listeners as $eventName => $eventListeners) {
+			if (!is_iterable($eventListeners)) {
+				continue;
+			}
+
+			foreach ($eventListeners as $listener) {
+				if (!is_callable($listener)) {
+					continue;
+				}
+
+				$registeredListeners[$eventName][] = [
+					'label' => ListenerDescriber::describe($listener),
+					'priority' => $this->dispatcher->getListenerPriority($eventName, $listener) ?? 0,
+				];
+			}
+		}
+
+		return $registeredListeners;
 	}
 
 }
