@@ -12,14 +12,15 @@ class LazyListener
 	public function __construct(
 		private readonly string $serviceName,
 		private readonly string $methodName,
-		private readonly Container $container
+		private readonly Container $container,
+		private readonly ?string $serviceType = null,
 	)
 	{
 	}
 
 	public function toString(): string
 	{
-		return get_class($this->service ?? $this) . '::' . $this->methodName;
+		return ($this->service !== null ? $this->service::class : $this->serviceType ?? $this->serviceName) . '::' . $this->methodName;
 	}
 
 	public function __invoke(): mixed

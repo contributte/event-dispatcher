@@ -5,6 +5,7 @@ namespace Contributte\EventDispatcher\Diagnostics;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Throwable;
 
 class DebugDispatcher implements EventDispatcherInterface
 {
@@ -13,6 +14,8 @@ class DebugDispatcher implements EventDispatcherInterface
 
 	/** @var LoggerInterface[] */
 	private array $loggers = [];
+
+	private ?EventTrace $lastTrace = null;
 
 	public function __construct(EventDispatcherInterface $original)
 	{
@@ -38,6 +41,11 @@ class DebugDispatcher implements EventDispatcherInterface
 	public function getLoggers(): array
 	{
 		return $this->loggers;
+	}
+
+	public function getLastTrace(): ?EventTrace
+	{
+		return $this->lastTrace;
 	}
 
 	/**
@@ -97,36 +105,73 @@ class DebugDispatcher implements EventDispatcherInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * @template T of object
+	 * @param T $event
+	 * @return T
 	 */
 	public function dispatch(object $event, ?string $eventName = null): object
 	{
 		$trace = new EventTrace($event, $eventName);
+		$trace->listeners = $this->getEventListeners($trace->name);
+		$trace->listenerCount = count($trace->listeners);
+		$this->lastTrace = $trace;
 
-		// Iterate over all loggers
 		foreach ($this->loggers as $logger) {
 			$logger->debug(sprintf('EventDispatcher@%s: event started', $trace->name), ['event' => $trace]);
 		}
 
-		// Start timer
 		$start = microtime(true);
 
-		// Dispatch event
-		$return = $this->original->dispatch($event, $eventName);
+		try {
+			return $this->original->dispatch($event, $eventName);
+		} catch (Throwable $e) {
+			$trace->exception = $e;
 
-		// If event was handled, mark it
-		if ($this->original->hasListeners($trace->name)) {
-			$trace->handled = true;
+			throw $e;
+		} finally {
+			$trace->handled = $trace->listenerCount > 0;
+			$trace->propagationStopped = $this->isPropagationStopped($event);
+			$trace->duration = microtime(true) - $start;
+			$this->afterDispatch($trace);
+
+			$message = $trace->exception === null
+				? sprintf('EventDispatcher@%s: event dispatched', $trace->name)
+				: sprintf('EventDispatcher@%s: event failed', $trace->name);
+
+			foreach ($this->loggers as $logger) {
+				$logger->debug($message, ['event' => $trace]);
+			}
+		}
+	}
+
+	protected function afterDispatch(EventTrace $trace): void
+	{
+		// Intended for subclasses.
+	}
+
+	private function isPropagationStopped(object $event): bool
+	{
+		return is_callable([$event, 'isPropagationStopped']) && (bool) $event->isPropagationStopped();
+	}
+
+	/**
+	 * @return array<int, array{listener: string, priority: int}>
+	 */
+	private function getEventListeners(string $eventName): array
+	{
+		$listeners = $this->original->getListeners($eventName);
+		$normalized = [];
+
+		foreach ($listeners as $listener) {
+			if (is_callable($listener)) {
+				$normalized[] = [
+					'listener' => ListenerDescriber::describe($listener),
+					'priority' => $this->original->getListenerPriority($eventName, $listener) ?? 0,
+				];
+			}
 		}
 
-		// Calculate duration
-		$trace->duration = microtime(true) - $start;
-
-		foreach ($this->loggers as $logger) {
-			$logger->debug(sprintf('EventDispatcher@%s: event dispatched', $trace->name), ['event' => $trace]);
-		}
-
-		return $return;
+		return $normalized;
 	}
 
 }

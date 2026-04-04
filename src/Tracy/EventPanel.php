@@ -25,6 +25,7 @@ class EventPanel implements IBarPanel
 	{
 		$totalCount = count($this->dispatcher->getEvents()); // @phpcs:ignore
 		$handledCount = $this->handledCount(); // @phpcs:ignore
+		$failedCount = $this->failedCount(); // @phpcs:ignore
 		$totalTime = $this->countTotalTime(); // @phpcs:ignore
 		$totalTime = number_format($totalTime * 1000, 1, '.', ' ') . ' ms'; // @phpcs:ignore
 
@@ -40,11 +41,10 @@ class EventPanel implements IBarPanel
 	public function getPanel(): string
 	{
 		$handledCount = $this->handledCount(); // @phpcs:ignore
+		$failedCount = $this->failedCount(); // @phpcs:ignore
 		$totalTime = $this->countTotalTime(); // @phpcs:ignore
 		$events = $this->dispatcher->getEvents(); // @phpcs:ignore
-		$listeners = $this->dispatcher->getListeners();
 		$deep = $this->deep; // @phpcs:ignore
-		ksort($listeners);
 		ob_start();
 		require __DIR__ . '/templates/panel.phtml';
 
@@ -69,6 +69,16 @@ class EventPanel implements IBarPanel
 		}
 
 		return $handled;
+	}
+
+	private function failedCount(): int
+	{
+		$failed = 0;
+		foreach ($this->dispatcher->getEvents() as $event) {
+			$failed += $event->exception !== null ? 1 : 0;
+		}
+
+		return $failed;
 	}
 
 }

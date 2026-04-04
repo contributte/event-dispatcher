@@ -2,6 +2,8 @@
 
 namespace Contributte\EventDispatcher\Diagnostics;
 
+use Throwable;
+
 class EventTrace
 {
 
@@ -9,14 +11,26 @@ class EventTrace
 
 	public string $name;
 
+	public string $eventClass;
+
 	public bool $handled = false;
 
+	public bool $propagationStopped = false;
+
 	public float $duration = 0.0;
+
+	public int $listenerCount = 0;
+
+	public ?Throwable $exception = null;
+
+	/** @var array<int, array{listener: string, priority: int}> */
+	public array $listeners = [];
 
 	public function __construct(object $event, ?string $eventName = null)
 	{
 		$this->event = $event;
-		$this->name = $eventName ?? $event::class;
+		$this->eventClass = $event::class;
+		$this->name = $eventName ?? $this->eventClass;
 	}
 
 }

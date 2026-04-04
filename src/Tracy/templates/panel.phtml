@@ -1,11 +1,11 @@
 <?php
-/** @var EventInfo[] $events */
-/** @var array<string,callable> $listeners */
+/** @var EventTrace[] $events */
 /** @var int $handledCount */
+/** @var int $failedCount */
 /** @var float $totalTime */
 /** @var int|null $deep */
 
-use Contributte\EventDispatcher\Diagnostics\EventInfo;
+use Contributte\EventDispatcher\Diagnostics\EventTrace;
 use Tracy\Dumper;
 
 $dumperOptions = [Dumper::COLLAPSE => true];
@@ -18,17 +18,37 @@ if ($deep !== null) {
 		font-weight: bold;
 	}
 
-	#tracy-debug .listeners {
-		list-style: none;
+	#tracy-debug .event-class,
+	#tracy-debug .event-meta,
+	#tracy-debug .muted {
+		color: #666;
+		font-size: 12px;
+	}
+
+	#tracy-debug .listener-row + .listener-row {
+		margin-top: 6px;
+	}
+
+	#tracy-debug .exception {
+		margin-top: 4px;
+		color: #b00020;
+	}
+
+	#tracy-debug ul.event-listeners {
+		margin: 0;
+		padding-left: 16px;
 	}
 </style>
+
 <?php if ($handledCount === 0): ?>
 	<h1>No events handled</h1>
 <?php else: ?>
-	<h1>Events:
-		<?= $handledCount ?>,
-		time:
-		<?= $totalTime ? sprintf('%0.3f', $totalTime * 1000) : ''; ?> ms
+	<h1>
+		Events: <?= $handledCount ?>
+		<?php if ($failedCount > 0): ?>
+			/ failed: <?= $failedCount ?>
+		<?php endif; ?>
+		, time: <?= sprintf('%0.3f', $totalTime * 1000) ?> ms
 	</h1>
 <?php endif; ?>
 
@@ -40,6 +60,7 @@ if ($deep !== null) {
 					<th>Time&nbsp;ms</th>
 					<th>Handled</th>
 					<th>Event</th>
+					<th>Listeners</th>
 				</tr>
 
 				<?php foreach ($events as $e): ?>
@@ -47,50 +68,46 @@ if ($deep !== null) {
 						<td>
 							<?= sprintf('%0.2f', $e->duration * 1000); ?>
 						</td>
-						<td><?= $e->handled ? 'yes' : 'no' ?></td>
 						<td>
+							<?= $e->handled ? 'yes' : 'no' ?>
+							<div class="event-meta">
+								<?= $e->listenerCount ?> listeners
+								<?php if ($e->propagationStopped): ?>
+									, stopped
+								<?php endif; ?>
+								<?php if ($e->exception !== null): ?>
+									, failed
+								<?php endif; ?>
+							</div>
+							<?php if ($e->exception !== null): ?>
+								<div class="exception">
+									<?= htmlspecialchars(get_class($e->exception) . ': ' . $e->exception->getMessage(), ENT_QUOTES, 'UTF-8') ?>
+								</div>
+							<?php endif; ?>
+						</td>
+						<td>
+							<code class="event-name"><?= htmlspecialchars($e->name, ENT_QUOTES, 'UTF-8') ?></code>
+							<?php if ($e->name !== $e->eventClass): ?>
+								<div class="event-class"><?= htmlspecialchars($e->eventClass, ENT_QUOTES, 'UTF-8') ?></div>
+							<?php endif; ?>
 							<?= Dumper::toHtml($e->event, $dumperOptions); ?>
+						</td>
+						<td>
+							<?php if ($e->listeners === []): ?>
+								<span class="muted">No listeners</span>
+							<?php else: ?>
+								<ul class="event-listeners">
+									<?php foreach ($e->listeners as $listener): ?>
+										<li><code class="listener-name"><?= htmlspecialchars($listener['listener'], ENT_QUOTES, 'UTF-8') ?></code> (priority <?= $listener['priority'] ?>)</li>
+									<?php endforeach; ?>
+								</ul>
+							<?php endif; ?>
 						</td>
 					</tr>
 				<?php endforeach; ?>
 			</table>
+		<?php else: ?>
+			<p class="muted">No events dispatched yet.</p>
 		<?php endif; ?>
-
-		<div style="margin-top: 2px;">
-			<h2>Listeners</h2>
-			<table style="margin-top: 0">
-				<tr>
-					<th>Event</th>
-					<th>Listeners</th>
-				</tr>
-
-				<?php foreach ($listeners as $eventName => $listen): ?>
-					<?php foreach ($listen as $i => $handler): ?>
-						<tr>
-							<?php if ($i === 0): ?>
-								<td rowspan="<?= count($listen) ?>">
-									<code class="event-name"><?= $eventName ?></code>
-								</td>
-							<?php endif; ?>
-							<td class="listener-name">
-								<?php
-								if (\is_array($handler) && \is_object($handler[0]) && \is_string($handler[1])) {
-									echo \get_class($handler[0]) . '::' . $handler[1];
-								} elseif ($handler instanceof \Contributte\EventDispatcher\LazyListener) {
-									echo $handler->toString();
-								} else {
-									echo Dumper::toHtml($handler, $dumperOptions);
-								}
-								?>
-							</td>
-						</tr>
-					<?php endforeach; ?>
-				<?php endforeach; ?>
-			</table>
-
-			<div style="margin-top: var(--tracy-space);">
-				<?= Dumper::toHtml($listeners, $dumperOptions); ?>
-			</div>
-		</div>
 	</div>
 </div>
