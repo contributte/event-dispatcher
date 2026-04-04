@@ -112,79 +112,41 @@ class DebugDispatcher implements EventDispatcherInterface
 	public function dispatch(object $event, ?string $eventName = null): object
 	{
 		$trace = new EventTrace($event, $eventName);
+		$trace->listeners = $this->getEventListeners($trace->name);
+		$trace->listenerCount = count($trace->listeners);
 		$this->lastTrace = $trace;
-		$this->onDispatchStarted($trace);
+
+		foreach ($this->loggers as $logger) {
+			$logger->debug(sprintf('EventDispatcher@%s: event started', $trace->name), ['event' => $trace]);
+		}
 
 		$start = microtime(true);
 
 		try {
-			$this->doDispatch($trace);
+			return $this->original->dispatch($event, $eventName);
 		} catch (Throwable $e) {
 			$trace->exception = $e;
 
 			throw $e;
 		} finally {
-			$trace->handled = $trace->calledCount > 0;
+			$trace->handled = $trace->listenerCount > 0;
 			$trace->propagationStopped = $this->isPropagationStopped($event);
 			$trace->duration = microtime(true) - $start;
-			$this->onDispatchFinished($trace);
-		}
+			$this->afterDispatch($trace);
 
-		return $event;
-	}
+			$message = $trace->exception === null
+				? sprintf('EventDispatcher@%s: event dispatched', $trace->name)
+				: sprintf('EventDispatcher@%s: event failed', $trace->name);
 
-	protected function onDispatchStarted(EventTrace $trace): void
-	{
-		foreach ($this->loggers as $logger) {
-			$logger->debug(sprintf('EventDispatcher@%s: event started', $trace->name), ['event' => $trace]);
-		}
-	}
-
-	protected function onDispatchFinished(EventTrace $trace): void
-	{
-		$message = $trace->exception === null
-			? sprintf('EventDispatcher@%s: event dispatched', $trace->name)
-			: sprintf('EventDispatcher@%s: event failed', $trace->name);
-
-		foreach ($this->loggers as $logger) {
-			$logger->debug($message, ['event' => $trace]);
-		}
-	}
-
-	protected function doDispatch(EventTrace $trace): void
-	{
-		$listeners = $this->getEventListeners($trace->name);
-		$trace->listenerCount = count($listeners);
-
-		foreach ($listeners as $listener) {
-			$trace->listeners[] = new ListenerTrace(
-				ListenerDescriber::describe($listener),
-				$this->original->getListenerPriority($trace->name, $listener) ?? 0,
-			);
-		}
-
-		foreach ($listeners as $index => $listener) {
-			$listenerTrace = $trace->listeners[$index];
-			$listenerTrace->called = true;
-			$trace->calledCount++;
-
-			$start = microtime(true);
-
-			try {
-				$listener($trace->event, $trace->name, $this);
-			} catch (Throwable $e) {
-				$listenerTrace->exception = $e;
-
-				throw $e;
-			} finally {
-				$listenerTrace->duration = microtime(true) - $start;
-				$listenerTrace->propagationStopped = $this->isPropagationStopped($trace->event);
-			}
-
-			if ($listenerTrace->propagationStopped) {
-				break;
+			foreach ($this->loggers as $logger) {
+				$logger->debug($message, ['event' => $trace]);
 			}
 		}
+	}
+
+	protected function afterDispatch(EventTrace $trace): void
+	{
+		// Intended for subclasses.
 	}
 
 	private function isPropagationStopped(object $event): bool
@@ -193,7 +155,7 @@ class DebugDispatcher implements EventDispatcherInterface
 	}
 
 	/**
-	 * @return list<callable>
+	 * @return array<int, array{listener: string, priority: int}>
 	 */
 	private function getEventListeners(string $eventName): array
 	{
@@ -202,7 +164,10 @@ class DebugDispatcher implements EventDispatcherInterface
 
 		foreach ($listeners as $listener) {
 			if (is_callable($listener)) {
-				$normalized[] = $listener;
+				$normalized[] = [
+					'listener' => ListenerDescriber::describe($listener),
+					'priority' => $this->original->getListenerPriority($eventName, $listener) ?? 0,
+				];
 			}
 		}
 

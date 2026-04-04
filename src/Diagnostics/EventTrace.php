@@ -21,11 +21,9 @@ class EventTrace
 
 	public int $listenerCount = 0;
 
-	public int $calledCount = 0;
-
 	public ?Throwable $exception = null;
 
-	/** @var ListenerTrace[] */
+	/** @var array<int, array{listener: string, priority: int}> */
 	public array $listeners = [];
 
 	public function __construct(object $event, ?string $eventName = null)

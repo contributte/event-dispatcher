@@ -49,10 +49,10 @@ Toolkit::test(function (): void {
 	Assert::type(EventTrace::class, $trace);
 	Assert::true($trace->handled);
 	Assert::same(1, $trace->listenerCount);
-	Assert::same(1, $trace->calledCount);
 	Assert::false($trace->propagationStopped);
 	Assert::count(1, $trace->listeners);
-	Assert::same('Tests\Fixtures\FooSubscriber::onFoobar', $trace->listeners[0]->label);
+	Assert::same('Tests\Fixtures\FooSubscriber::onFoobar', $trace->listeners[0]['listener']);
+	Assert::same(0, $trace->listeners[0]['priority']);
 	Assert::null($trace->exception);
 	Assert::notNull($dd->getLastTrace());
 	Assert::notNull($dd->getLoggers());
@@ -92,9 +92,8 @@ Toolkit::test(function (): void {
 	Assert::type(EventTrace::class, $trace);
 	Assert::true($trace->handled);
 	Assert::same(1, $trace->listenerCount);
-	Assert::same(1, $trace->calledCount);
 	Assert::type(RuntimeException::class, $trace->exception);
 	Assert::count(1, $trace->listeners);
-	Assert::same('Tests\Fixtures\ThrowingSubscriber::onBroken', $trace->listeners[0]->label);
-	Assert::type(RuntimeException::class, $trace->listeners[0]->exception);
+	Assert::same('Tests\Fixtures\ThrowingSubscriber::onBroken', $trace->listeners[0]['listener']);
+	Assert::same(0, $trace->listeners[0]['priority']);
 });

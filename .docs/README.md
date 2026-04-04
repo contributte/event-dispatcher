@@ -84,7 +84,7 @@ events:
 When enabled, the Tracy panel shows:
 
 - dispatched events with total duration and payload dump
-- called vs skipped listeners, including their priorities
+- registered listeners for each dispatched event, including their priorities
 - propagation stop and listener failures when they happen
 
 ### Logging

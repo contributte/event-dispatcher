@@ -16,11 +16,9 @@ class TracyDispatcher extends DebugDispatcher
 		return $this->events;
 	}
 
-	protected function onDispatchFinished(EventTrace $trace): void
+	protected function afterDispatch(EventTrace $trace): void
 	{
 		$this->events[] = $trace;
-
-		parent::onDispatchFinished($trace);
 	}
 
 }

@@ -1,6 +1,5 @@
 <?php
 /** @var EventTrace[] $events */
-/** @var array<string, array<int, array{label: string, priority: int}>> $registeredListeners */
 /** @var int $handledCount */
 /** @var int $failedCount */
 /** @var float $totalTime */
@@ -21,7 +20,6 @@ if ($deep !== null) {
 
 	#tracy-debug .event-class,
 	#tracy-debug .event-meta,
-	#tracy-debug .listener-meta,
 	#tracy-debug .muted {
 		color: #666;
 		font-size: 12px;
@@ -35,57 +33,45 @@ if ($deep !== null) {
 		margin-top: 4px;
 		color: #b00020;
 	}
+
+	#tracy-debug ul.event-listeners {
+		margin: 0;
+		padding-left: 16px;
+	}
 </style>
 
-<h1>Event dispatcher</h1>
+<?php if ($handledCount === 0): ?>
+	<h1>No events handled</h1>
+<?php else: ?>
+	<h1>
+		Events: <?= $handledCount ?>
+		<?php if ($failedCount > 0): ?>
+			/ failed: <?= $failedCount ?>
+		<?php endif; ?>
+		, time: <?= sprintf('%0.3f', $totalTime * 1000) ?> ms
+	</h1>
+<?php endif; ?>
 
 <div class="tracy-inner">
 	<div class="tracy-inner-container">
-		<table>
-			<tr>
-				<th>Dispatched events</th>
-				<td><?= count($events) ?></td>
-			</tr>
-			<tr>
-				<th>Handled events</th>
-				<td><?= $handledCount ?></td>
-			</tr>
-			<tr>
-				<th>Failed events</th>
-				<td><?= $failedCount ?></td>
-			</tr>
-			<tr>
-				<th>Total time</th>
-				<td><?= sprintf('%0.3f', $totalTime * 1000) ?> ms</td>
-			</tr>
-		</table>
-
-		<h2>Dispatched events</h2>
 		<?php if ($events !== []): ?>
 			<table class="tracy-sortable">
 				<tr>
-					<th>Event</th>
 					<th>Time&nbsp;ms</th>
-					<th>Status</th>
+					<th>Handled</th>
+					<th>Event</th>
 					<th>Listeners</th>
-					<th>Payload</th>
 				</tr>
 
 				<?php foreach ($events as $e): ?>
 					<tr>
 						<td>
-							<code class="event-name"><?= htmlspecialchars($e->name, ENT_QUOTES, 'UTF-8') ?></code>
-							<?php if ($e->name !== $e->eventClass): ?>
-								<div class="event-class"><?= htmlspecialchars($e->eventClass, ENT_QUOTES, 'UTF-8') ?></div>
-							<?php endif; ?>
-						</td>
-						<td>
 							<?= sprintf('%0.2f', $e->duration * 1000); ?>
 						</td>
 						<td>
-							<?= $e->handled ? 'handled' : 'ignored' ?>
+							<?= $e->handled ? 'yes' : 'no' ?>
 							<div class="event-meta">
-								<?= $e->calledCount ?>/<?= $e->listenerCount ?> called
+								<?= $e->listenerCount ?> listeners
 								<?php if ($e->propagationStopped): ?>
 									, stopped
 								<?php endif; ?>
@@ -100,31 +86,22 @@ if ($deep !== null) {
 							<?php endif; ?>
 						</td>
 						<td>
+							<code class="event-name"><?= htmlspecialchars($e->name, ENT_QUOTES, 'UTF-8') ?></code>
+							<?php if ($e->name !== $e->eventClass): ?>
+								<div class="event-class"><?= htmlspecialchars($e->eventClass, ENT_QUOTES, 'UTF-8') ?></div>
+							<?php endif; ?>
+							<?= Dumper::toHtml($e->event, $dumperOptions); ?>
+						</td>
+						<td>
 							<?php if ($e->listeners === []): ?>
 								<span class="muted">No listeners</span>
 							<?php else: ?>
-								<?php foreach ($e->listeners as $listener): ?>
-									<div class="listener-row">
-										<code class="listener-name"><?= htmlspecialchars($listener->label, ENT_QUOTES, 'UTF-8') ?></code>
-										<div class="listener-meta">
-											priority <?= $listener->priority ?>,
-											<?= $listener->called ? 'called' : 'skipped' ?>
-											<?php if ($listener->called): ?>
-												, <?= sprintf('%0.2f', $listener->duration * 1000) ?> ms
-											<?php endif; ?>
-											<?php if ($listener->propagationStopped): ?>
-												, stopped propagation
-											<?php endif; ?>
-											<?php if ($listener->exception !== null): ?>
-												, failed
-											<?php endif; ?>
-										</div>
-									</div>
-								<?php endforeach; ?>
+								<ul class="event-listeners">
+									<?php foreach ($e->listeners as $listener): ?>
+										<li><code class="listener-name"><?= htmlspecialchars($listener['listener'], ENT_QUOTES, 'UTF-8') ?></code> (priority <?= $listener['priority'] ?>)</li>
+									<?php endforeach; ?>
+								</ul>
 							<?php endif; ?>
-						</td>
-						<td>
-							<?= Dumper::toHtml($e->event, $dumperOptions); ?>
 						</td>
 					</tr>
 				<?php endforeach; ?>
@@ -132,36 +109,5 @@ if ($deep !== null) {
 		<?php else: ?>
 			<p class="muted">No events dispatched yet.</p>
 		<?php endif; ?>
-
-		<div style="margin-top: var(--tracy-space);">
-			<h2>Registered listeners</h2>
-			<?php if ($registeredListeners === []): ?>
-				<p class="muted">No listeners registered.</p>
-			<?php else: ?>
-			<table style="margin-top: 0">
-				<tr>
-					<th>Event</th>
-					<th>Priority</th>
-					<th>Listeners</th>
-				</tr>
-
-				<?php foreach ($registeredListeners as $eventName => $listeners): ?>
-					<?php foreach ($listeners as $i => $listener): ?>
-						<tr>
-							<?php if ($i === 0): ?>
-								<td rowspan="<?= count($listeners) ?>">
-									<code class="event-name"><?= $eventName ?></code>
-								</td>
-							<?php endif; ?>
-							<td><?= $listener['priority'] ?></td>
-							<td class="listener-name">
-								<code><?= htmlspecialchars($listener['label'], ENT_QUOTES, 'UTF-8') ?></code>
-							</td>
-						</tr>
-					<?php endforeach; ?>
-				<?php endforeach; ?>
-			</table>
-			<?php endif; ?>
-		</div>
 	</div>
 </div>

@@ -2,7 +2,6 @@
 
 namespace Contributte\EventDispatcher\Tracy;
 
-use Contributte\EventDispatcher\Diagnostics\ListenerDescriber;
 use Contributte\EventDispatcher\Diagnostics\TracyDispatcher;
 use Tracy\IBarPanel;
 
@@ -45,7 +44,6 @@ class EventPanel implements IBarPanel
 		$failedCount = $this->failedCount(); // @phpcs:ignore
 		$totalTime = $this->countTotalTime(); // @phpcs:ignore
 		$events = $this->dispatcher->getEvents(); // @phpcs:ignore
-		$registeredListeners = $this->collectRegisteredListeners(); // @phpcs:ignore
 		$deep = $this->deep; // @phpcs:ignore
 		ob_start();
 		require __DIR__ . '/templates/panel.phtml';
@@ -81,35 +79,6 @@ class EventPanel implements IBarPanel
 		}
 
 		return $failed;
-	}
-
-	/**
-	 * @return array<string, array<int, array{label: string, priority: int}>>
-	 */
-	private function collectRegisteredListeners(): array
-	{
-		$listeners = $this->dispatcher->getListeners();
-		ksort($listeners);
-
-		$registeredListeners = [];
-		foreach ($listeners as $eventName => $eventListeners) {
-			if (!is_iterable($eventListeners)) {
-				continue;
-			}
-
-			foreach ($eventListeners as $listener) {
-				if (!is_callable($listener)) {
-					continue;
-				}
-
-				$registeredListeners[$eventName][] = [
-					'label' => ListenerDescriber::describe($listener),
-					'priority' => $this->dispatcher->getListenerPriority($eventName, $listener) ?? 0,
-				];
-			}
-		}
-
-		return $registeredListeners;
 	}
 
 }

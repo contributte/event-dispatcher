@@ -74,13 +74,13 @@ Toolkit::test(function (): void {
 	Assert::same(Event::class, $trace->eventClass);
 	Assert::true($trace->handled);
 	Assert::same(1, $trace->listenerCount);
-	Assert::same(1, $trace->calledCount);
 	Assert::false($trace->propagationStopped);
 	Assert::count(1, $trace->listeners);
-	Assert::same('Tests\Fixtures\FooSubscriber::onFoobar', $trace->listeners[0]->label);
+	Assert::same('Tests\Fixtures\FooSubscriber::onFoobar', $trace->listeners[0]['listener']);
+	Assert::same(0, $trace->listeners[0]['priority']);
 
 	Assert::contains('Tests\Fixtures\FooSubscriber::onFoobar', $panel->getPanel());
-	Assert::contains('1/1 called', $panel->getPanel());
+	Assert::contains('1 listeners', $panel->getPanel());
 });
 
 // Capture propagation stop and skipped listeners
@@ -117,13 +117,11 @@ Toolkit::test(function (): void {
 	Assert::true($trace->handled);
 	Assert::true($trace->propagationStopped);
 	Assert::same(2, $trace->listenerCount);
-	Assert::same(1, $trace->calledCount);
 	Assert::count(2, $trace->listeners);
-	Assert::true($trace->listeners[0]->called);
-	Assert::true($trace->listeners[0]->propagationStopped);
-	Assert::false($trace->listeners[1]->called);
-	Assert::same('Tests\Fixtures\StoppingSubscriber::onStoppable', $trace->listeners[0]->label);
-	Assert::same('Tests\Fixtures\FollowingSubscriber::onStoppable', $trace->listeners[1]->label);
+	Assert::same('Tests\Fixtures\StoppingSubscriber::onStoppable', $trace->listeners[0]['listener']);
+	Assert::same(10, $trace->listeners[0]['priority']);
+	Assert::same('Tests\Fixtures\FollowingSubscriber::onStoppable', $trace->listeners[1]['listener']);
+	Assert::same(0, $trace->listeners[1]['priority']);
 
 	/** @var StoppingSubscriber $stopping */
 	$stopping = $container->getByType(StoppingSubscriber::class);
