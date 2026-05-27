@@ -91,24 +91,25 @@ final class Reflector
 	): ListenerDefinition
 	{
 		$listener = $attribute->newInstance();
+		$className = $reflection->getName();
 
 		if ($listener->dispatcher !== null) {
 			throw new ServiceCreationException(sprintf(
 				'Event listener %s cannot use dispatcher in #[AsEventListener], named dispatchers are not supported.',
-				$reflection->getName(),
+				$className,
 			));
 		}
 
 		if ($method !== null && $listener->method !== null) {
 			throw new ServiceCreationException(sprintf(
 				'Event listener %s::%s() cannot declare method in #[AsEventListener].',
-				$reflection->getName(),
+				$className,
 				$method->getName(),
 			));
 		}
 
 		$methodName = $method?->getName() ?? self::resolveAttributedMethod($reflection, $listener);
-		self::assertListenerMethod($reflection->getName(), $methodName);
+		self::assertListenerMethod($className, $methodName);
 
 		$eventName = $listener->event ?? self::inferAttributedEventName($reflection, $methodName);
 

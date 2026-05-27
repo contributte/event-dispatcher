@@ -106,11 +106,7 @@ class EventDispatcherExtension extends CompilerExtension
 		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
 		assert($dispatcher instanceof ServiceDefinition);
 
-		foreach ($builderMan->getSubscriberListeners() as $listener) {
-			$builderMan->registerListener($dispatcher, $listener);
-		}
-
-		foreach ($builderMan->getAttributedListeners() as $listener) {
+		foreach ($builderMan->getListeners() as $listener) {
 			$builderMan->registerListener($dispatcher, $listener);
 		}
 	}
