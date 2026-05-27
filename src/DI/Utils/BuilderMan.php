@@ -21,24 +21,28 @@ final class BuilderMan
 		return new self($builder);
 	}
 
+	public function registerListeners(ServiceDefinition $dispatcher): void
+	{
+		$container = $this->builder->getDefinitionByType(Container::class);
+
+		foreach ($this->getListeners() as $listener) {
+			$dispatcher->addSetup('addListener', [
+				'eventName' => $listener->eventName,
+				'listener' => new Statement(LazyListener::class, [$listener->serviceName, $listener->methodName, $container]),
+				'priority' => $listener->priority,
+			]);
+		}
+	}
+
 	/**
 	 * @return list<ListenerDefinition>
 	 */
-	public function getListeners(): array
+	private function getListeners(): array
 	{
 		return [
 			...$this->getSubscriberListeners(),
 			...$this->getAttributedListeners(),
 		];
-	}
-
-	public function registerListener(ServiceDefinition $dispatcher, ListenerDefinition $listener): void
-	{
-		$dispatcher->addSetup('addListener', [
-			'eventName' => $listener->eventName,
-			'listener' => new Statement(LazyListener::class, [$listener->serviceName, $listener->methodName, $this->builder->getDefinitionByType(Container::class)]),
-			'priority' => $listener->priority,
-		]);
 	}
 
 	/**

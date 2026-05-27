@@ -71,9 +71,15 @@ class EventDispatcherExtension extends CompilerExtension
 	{
 		$config = $this->getConfig();
 
-		if ($config->autoload === true) {
-			$this->doBeforeCompile();
+		if ($config->autoload !== true) {
+			return;
 		}
+
+		$builder = $this->getContainerBuilder();
+		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
+		assert($dispatcher instanceof ServiceDefinition);
+
+		BuilderMan::of($builder)->registerListeners($dispatcher);
 	}
 
 	public function afterCompile(ClassType $class): void
@@ -93,21 +99,6 @@ class EventDispatcherExtension extends CompilerExtension
 					]),
 				])
 			);
-		}
-	}
-
-	/**
-	 * Collect listeners and subscribers in lazy-way
-	 */
-	private function doBeforeCompile(): void
-	{
-		$builder = $this->getContainerBuilder();
-		$builderMan = BuilderMan::of($builder);
-		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
-		assert($dispatcher instanceof ServiceDefinition);
-
-		foreach ($builderMan->getListeners() as $listener) {
-			$builderMan->registerListener($dispatcher, $listener);
 		}
 	}
 
