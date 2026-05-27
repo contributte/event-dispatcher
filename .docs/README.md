@@ -4,6 +4,7 @@
 
 - [Setup](#setup)
 - [Configuration](#configuration)
+- [Listener - example listener](#listener)
 - [Subscriber - example subscriber](#subscriber)
 - [Dispatcher - dispatching events](#dispatcher)
 - [Extra - extra Nette bridge](#extra)
@@ -32,8 +33,8 @@ extensions:
 	events: Contributte\EventDispatcher\DI\EventDispatcherExtension
 ```
 
-The extension looks for all services implementing `Symfony\Component\EventDispatcher\EventSubscriberInterface`.
-And automatically adds them to the event dispatcher. That's all. You don't have to be worried.
+The extension looks for all services implementing `Symfony\Component\EventDispatcher\EventSubscriberInterface`
+and all services using Symfony's `#[AsEventListener]` attribute. Matching services are added to the event dispatcher automatically.
 
 ## Configuration
 
@@ -41,7 +42,6 @@ And automatically adds them to the event dispatcher. That's all. You don't have 
 
 ```neon
 events:
-	lazy: true
 	autoload: true
 	debug:
 		panel: false
@@ -51,20 +51,11 @@ events:
 
 ### Autoload
 
-Autoload option is enabled (`true`) as default. If you would like to add all subscribers by yourself, you have to disable `autoload`.
+Autoload option is enabled (`true`) as default. If you would like to register subscribers and attribute listeners by yourself, you have to disable `autoload`.
 
 ```neon
 events:
 	autoload: true/false
-```
-
-### Lazy-loading
-
-Lazy option is enabled (`true`) as default. But you can override it.
-
-```neon
-events:
-	lazy: true/false
 ```
 
 ### Debug
@@ -90,6 +81,40 @@ events:
 	loggers:
 		- App\Logger\FileLogger(%tempDir%/events.log)
 ```
+
+## Listener
+
+You can register listeners with Symfony's native `#[AsEventListener]` attribute.
+
+```php
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+
+final class OrderListener
+{
+
+	#[AsEventListener(event: OrderCreatedEvent::class, priority: 10)]
+	public function onOrderCreated(OrderCreatedEvent $event): void
+	{
+		// Do some magic here...
+	}
+
+	#[AsEventListener]
+	public function onOrderPaid(OrderPaidEvent $event): void
+	{
+		// The event name is inferred from the first typed argument.
+	}
+
+}
+```
+
+```neon
+services:
+	- OrderListener
+```
+
+Class-level attributes are supported too. If `method` is omitted, the extension tries `on<EventName>()` first and then `__invoke()`.
+If `event` is omitted, the first argument of the selected method must be typed with a concrete event class.
+String event names cannot be inferred, so they still need `event:`.
 
 ## Subscriber
 
