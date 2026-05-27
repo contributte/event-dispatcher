@@ -125,35 +125,6 @@ Toolkit::test(function (): void {
 	Assert::equal([$typedEvent], $invokableListener->onCall);
 });
 
-// Register listeners eagerly when lazy loading is disabled.
-Toolkit::test(function (): void {
-	$container = ContainerBuilder::of()
-		->withCompiler(function (Compiler $compiler): void {
-			$compiler->addExtension('events', new EventDispatcherExtension());
-			$compiler->addConfig(Neonkit::load(<<<'NEON'
-				events:
-					lazy: false
-				services:
-					listener: Tests\Fixtures\MethodAttributedListener
-			NEON
-			));
-		})->build();
-
-	Assert::false($container->isCreated('listener'));
-
-	/** @var EventDispatcherInterface $em */
-	$em = $container->getByType(EventDispatcherInterface::class);
-
-	Assert::true($container->isCreated('listener'));
-
-	$event = new Event();
-	$em->dispatch($event, 'listener.method');
-
-	/** @var MethodAttributedListener $listener */
-	$listener = $container->getByType(MethodAttributedListener::class);
-	Assert::equal([$event], $listener->onMethodCall);
-});
-
 // Do not autoload attribute listeners when disabled.
 Toolkit::test(function (): void {
 	$container = ContainerBuilder::of()

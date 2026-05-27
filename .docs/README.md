@@ -42,7 +42,6 @@ and all services using Symfony's `#[AsEventListener]` attribute. Matching servic
 
 ```neon
 events:
-	lazy: true
 	autoload: true
 	debug:
 		panel: false
@@ -57,15 +56,6 @@ Autoload option is enabled (`true`) as default. If you would like to register su
 ```neon
 events:
 	autoload: true/false
-```
-
-### Lazy-loading
-
-Lazy option is enabled (`true`) as default. But you can override it for both subscribers and attribute listeners.
-
-```neon
-events:
-	lazy: true/false
 ```
 
 ### Debug

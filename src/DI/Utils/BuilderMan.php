@@ -22,17 +22,6 @@ final class BuilderMan
 	}
 
 	/**
-	 * @return array<string, ServiceDefinition>
-	 */
-	public function getSubscribers(): array
-	{
-		/** @var array<string, ServiceDefinition> $subscribers */
-		$subscribers = $this->builder->findByType(EventSubscriberInterface::class);
-
-		return $subscribers;
-	}
-
-	/**
 	 * @return list<ListenerDefinition>
 	 */
 	public function getSubscriberListeners(): array
@@ -74,17 +63,24 @@ final class BuilderMan
 		return $listeners;
 	}
 
-	public function registerListener(ServiceDefinition $dispatcher, ListenerDefinition $listener, bool $lazy): void
+	public function registerListener(ServiceDefinition $dispatcher, ListenerDefinition $listener): void
 	{
-		$callable = $lazy
-			? new Statement(LazyListener::class, [$listener->serviceName, $listener->methodName, $this->builder->getDefinitionByType(Container::class)])
-			: [$this->builder->getDefinition($listener->serviceName), $listener->methodName];
-
 		$dispatcher->addSetup('addListener', [
 			'eventName' => $listener->eventName,
-			'listener' => $callable,
+			'listener' => new Statement(LazyListener::class, [$listener->serviceName, $listener->methodName, $this->builder->getDefinitionByType(Container::class)]),
 			'priority' => $listener->priority,
 		]);
+	}
+
+	/**
+	 * @return array<string, ServiceDefinition>
+	 */
+	private function getSubscribers(): array
+	{
+		/** @var array<string, ServiceDefinition> $subscribers */
+		$subscribers = $this->builder->findByType(EventSubscriberInterface::class);
+
+		return $subscribers;
 	}
 
 	/**

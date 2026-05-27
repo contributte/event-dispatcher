@@ -26,7 +26,6 @@ class EventDispatcherExtension extends CompilerExtension
 	public function getConfigSchema(): Schema
 	{
 		return Expect::structure([
-			'lazy' => Expect::bool(true),
 			'autoload' => Expect::bool(true),
 			'debug' => Expect::structure([
 				'panel' => Expect::bool(false),
@@ -73,11 +72,7 @@ class EventDispatcherExtension extends CompilerExtension
 		$config = $this->getConfig();
 
 		if ($config->autoload === true) {
-			if ($config->lazy === true) {
-				$this->doBeforeCompileLaziness();
-			} else {
-				$this->doBeforeCompile();
-			}
+			$this->doBeforeCompile();
 		}
 	}
 
@@ -102,7 +97,7 @@ class EventDispatcherExtension extends CompilerExtension
 	}
 
 	/**
-	 * Collect listeners and subscribers
+	 * Collect listeners and subscribers in lazy-way
 	 */
 	private function doBeforeCompile(): void
 	{
@@ -111,31 +106,12 @@ class EventDispatcherExtension extends CompilerExtension
 		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
 		assert($dispatcher instanceof ServiceDefinition);
 
-		foreach ($builderMan->getSubscribers() as $subscriber) {
-			$dispatcher->addSetup('addSubscriber', [$subscriber]);
-		}
-
-		foreach ($builderMan->getAttributedListeners() as $listener) {
-			$builderMan->registerListener($dispatcher, $listener, lazy: false);
-		}
-	}
-
-	/**
-	 * Collect listeners and subscribers in lazy-way
-	 */
-	private function doBeforeCompileLaziness(): void
-	{
-		$builder = $this->getContainerBuilder();
-		$builderMan = BuilderMan::of($builder);
-		$dispatcher = $builder->getDefinition($this->prefix('dispatcher'));
-		assert($dispatcher instanceof ServiceDefinition);
-
 		foreach ($builderMan->getSubscriberListeners() as $listener) {
-			$builderMan->registerListener($dispatcher, $listener, lazy: true);
+			$builderMan->registerListener($dispatcher, $listener);
 		}
 
 		foreach ($builderMan->getAttributedListeners() as $listener) {
-			$builderMan->registerListener($dispatcher, $listener, lazy: true);
+			$builderMan->registerListener($dispatcher, $listener);
 		}
 	}
 
