@@ -46,6 +46,7 @@ The extension automatically discovers all services implementing `Symfony\Compone
 
 ## Contents
 
+- [Quick start](#quick-start)
 - [Key concepts](#key-concepts)
 - [Configuration](#configuration)
 - [Subscribers](#subscribers)
@@ -53,6 +54,17 @@ The extension automatically discovers all services implementing `Symfony\Compone
 - [Advanced](#advanced)
 - [Testing](#testing)
 - [Extra](#extra)
+
+## Quick start
+
+For a typical application, start with this path:
+
+1. Register the extension as shown in [Installation](#installation).
+2. Create an event value object, see [Creating Events](#creating-events).
+3. Create an `EventSubscriberInterface` service, see [Creating a Subscriber](#creating-a-subscriber).
+4. Inject `Symfony\Contracts\EventDispatcher\EventDispatcherInterface` and call `dispatch()`, see [Dispatching Events](#dispatching-events).
+
+Keep `autoload: true` enabled unless you need manual subscriber registration.
 
 ## Key Concepts
 
